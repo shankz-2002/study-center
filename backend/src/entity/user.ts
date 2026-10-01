@@ -6,7 +6,10 @@ export class User{
     id:string
 
     @Column({type:'varchar'})
-    name:string
+    firstName:string
+    
+    @Column({type:'varchar'})
+    lastName:string
 
     @Column({type:'varchar'})
     password:string

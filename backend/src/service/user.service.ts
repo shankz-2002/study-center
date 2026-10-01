@@ -5,7 +5,8 @@ import { tokenUtil } from "../utils/token.js";
 
 export class userService {
   static registerUser = async (
-    name: string,
+    firstName: string,
+    lastName:string,
     password: string,
     email: string,
   ) => {
@@ -17,7 +18,8 @@ export class userService {
 
     const hashedPassword = await bcrpyt.hash(password, saltRounds);
     const newUser = userRepository.create({
-      name,
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
     });
