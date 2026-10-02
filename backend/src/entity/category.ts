@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Fields } from "./fields.js";
+import { Topic } from "./topic.js";
 
 @Entity()
 export class Category {
@@ -16,13 +17,15 @@ export class Category {
   @Column({ type: "varchar", unique: true })
   categoryName: string;
 
-  @Column({type:"varchar"})
-  description:string
+  @Column({ type: "varchar" })
+  description: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(()=>Fields,field=>field.categories)
-  field:Fields
+  @ManyToOne(() => Fields, (field) => field.categories)
+  field: Fields;
 
+  @OneToMany(() => Topic, (topic) => topic.category)
+  topics: Topic[];
 }

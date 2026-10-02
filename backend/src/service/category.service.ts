@@ -42,4 +42,7 @@ export class categoryService {
     category.description = description;
     return await categoryRepository.save(category);
   };
+  static getCategory = async (id: string) => {
+    return categoryRepository.findOne({ where: { id } });
+  };
 }
