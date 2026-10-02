@@ -26,9 +26,7 @@ export class topicService {
       throw new ApiError(404, "No Category not found");
     }
     const topics = await topicRepository.find({ where: { category: { id } } });
-    if (topics.length == 0) {
-      throw new ApiError(404, "Topics empty");
-    }
+
     return topics;
   };
 
