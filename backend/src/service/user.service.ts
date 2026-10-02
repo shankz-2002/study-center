@@ -32,7 +32,7 @@ export class userService {
     }
     const id = existingUser.id;
     const accessToken = await tokenUtil.createToken(id);
-    const { password: _, ...user } = existingUser;
+    const { password:_,createdAt, ...user } = existingUser;
     const newUser = {
       user,
       accessToken,

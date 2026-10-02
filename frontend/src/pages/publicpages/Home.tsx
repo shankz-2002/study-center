@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { getFields } from "../../services/field";
+import type { ApiError } from "../../types/Error";
+import { toast } from "react-toastify";
+import { CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 type Field = {
   id: string;
   fieldName: string;
@@ -8,13 +12,20 @@ type Field = {
 
 function Home() {
   const [fields, setFields] = useState<Field[]>([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const fetchFields = async () => {
     try {
+      setLoading(true);
       const result = await getFields();
-      console.log("this is the result", result.data.fields);
-      setFields(result.data.fields);
+      if (result.data.success) {
+        setFields(result.data.fields);
+      }
     } catch (error) {
-      console.log(error);
+      const err = error as ApiError;
+      toast.error(err.data?.message || "failed to fetch details");
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -23,12 +34,20 @@ function Home() {
   }, []);
   return (
     <>
-      {fields?.map((field) => (
-        <div>
-          <p key={field.id}>{field.fieldName}</p>
-          <p>{field.description}</p>
-        </div>
-      ))}
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        fields.map((field) => (
+          <div
+            key={field.id}
+            onClick={() => navigate(`/fields/${field.id}`)}
+            style={{ cursor: "pointer" }}
+          >
+            <p>{field.fieldName}</p>
+            <p>{field.description}</p>
+          </div>
+        ))
+      )}
     </>
   );
 }

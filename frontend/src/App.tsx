@@ -5,25 +5,27 @@ import Login from "./pages/publicpages/Login";
 import Navbar from "./components/Navbar";
 import ProtectedRouteLayout from "./layout/ProtectedRouteLayout";
 import Field from "./pages/privatepages/Field";
+import { ToastContainer } from "react-toastify";
 
 function App() {
-    return (
-        <>
-            <Navbar />
+  return (
+    <>
+      <Navbar />
+      <ToastContainer position="top-right" autoClose={2000} />
 
-            <Routes>
-                <Route path="/" element={<Navigate to="/home" replace />} />
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" replace />} />
 
-                <Route path="/home" element={<Home />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
 
-                <Route element={<ProtectedRouteLayout />}>
-                    <Route path="/fields/:id" element={<Field />} />
-                </Route>
-            </Routes>
-        </>
-    );
+        <Route element={<ProtectedRouteLayout />}>
+          <Route path="/fields/:id" element={<Field />} />
+        </Route>
+      </Routes>
+    </>
+  );
 }
 
 export default App;
