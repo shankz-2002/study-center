@@ -3,9 +3,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Topic } from "./topic.js";
+import { Learning } from "./learning.js";
 
 @Entity()
 export class Level {
@@ -28,4 +30,7 @@ export class Level {
     onDelete: "CASCADE",
   })
   topic: Topic;
+
+  @OneToMany(() => Learning, (learning) => learning.level)
+  learning: Learning[];
 }

@@ -1,152 +1,3 @@
-// import { useEffect, useState } from "react";
-// import {
-//   Box,
-//   Card,
-//   CardActionArea,
-//   CardContent,
-//   CircularProgress,
-//   Container,
-//   Grid,
-//   Typography,
-// } from "@mui/material";
-// import { useParams } from "react-router-dom";
-// import { toast } from "react-toastify";
-
-// import type { Topic } from "../../types/Topic";
-// import type { ApiError } from "../../types/Error";
-
-// import { getAllTopics } from "../../services/topic";
-
-// function Category() {
-//   const [loading, setLoading] = useState(false);
-//   const [topics, setTopics] = useState<Topic[]>([]);
-
-//   const { id } = useParams();
-
-//   useEffect(() => {
-//     const fetchTopics = async () => {
-//       try {
-//         setLoading(true);
-
-//         if (id) {
-//           const response = await getAllTopics(id);
-
-//           if (response.data.success) {
-//             setTopics(response.data.topics);
-//           }
-//         }
-//       } catch (error) {
-//         const err = error as ApiError;
-
-//         toast.error(err.data?.message || "Failed to fetch topics");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchTopics();
-//   }, [id]);
-
-//   return (
-//     <Container maxWidth="lg" sx={{ py: 6 }}>
-//       {/* Header */}
-//       <Box sx={{ textAlign: "center", mb: 6 }}>
-//         <Typography
-//           variant="h3"
-//           component="h1"
-//           sx={{
-//             fontWeight: 700,
-//             mb: 1,
-//           }}
-//         >
-//           Explore Topics
-//         </Typography>
-
-//         <Typography
-//           variant="body1"
-//           color="text.secondary"
-//           sx={{
-//             maxWidth: 650,
-//             mx: "auto",
-//           }}
-//         >
-//           Choose a topic and start learning.
-//         </Typography>
-//       </Box>
-
-//       {/* Loading */}
-//       {loading ? (
-//         <Box
-//           sx={{
-//             display: "flex",
-//             justifyContent: "center",
-//             alignItems: "center",
-//             minHeight: 250,
-//           }}
-//         >
-//           <CircularProgress />
-//         </Box>
-//       ) : topics.length === 0 ? (
-//         <Box
-//           sx={{
-//             textAlign: "center",
-//             py: 8,
-//           }}
-//         >
-//           <Typography variant="h6" color="text.secondary">
-//             No topics found.
-//           </Typography>
-//         </Box>
-//       ) : (
-//         <Grid container spacing={3}>
-//           {topics.map((topic) => (
-//             <Grid key={topic.id} size={{ xs: 12, sm: 6, md: 4 }}>
-//               <Card
-//                 sx={{
-//                   height: "100%",
-//                   borderRadius: 3,
-//                   transition: "0.2s",
-//                   "&:hover": {
-//                     transform: "translateY(-5px)",
-//                     boxShadow: 6,
-//                   },
-//                 }}
-//               >
-//                 <CardActionArea
-//                   sx={{
-//                     height: "100%",
-//                   }}
-//                 >
-//                   <CardContent sx={{ p: 3 }}>
-//                     <Typography
-//                       variant="h5"
-//                       component="h2"
-//                       sx={{
-//                         fontWeight: 600,
-//                         mb: 1,
-//                       }}
-//                     >
-//                       {topic.topicName}
-//                     </Typography>
-
-//                     <Typography variant="body2" color="text.secondary">
-//                       {topic.description}
-//                     </Typography>
-//                   </CardContent>
-//                 </CardActionArea>
-//               </Card>
-//             </Grid>
-//           ))}
-//         </Grid>
-//       )}
-//     </Container>
-//   );
-// }
-
-// export default Category;
-
-
-
 
 import { useEffect, useState } from "react";
 import {
@@ -160,7 +11,7 @@ import {
   Typography,
   Chip,
 } from "@mui/material";
-import {  useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import type { Topic } from "../../types/Topic";
@@ -180,7 +31,7 @@ function Category() {
   const [topics, setTopics] = useState<Topic[]>([]);
 
   const { id } = useParams();
-//   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -230,7 +81,7 @@ function Category() {
         {/* ---------------- Back to categories ---------------- */}
         <Box
           component="button"
-        //   onClick={() => navigate(-1)}
+          onClick={() => navigate(-1)}
           sx={{
             all: "unset",
             cursor: "pointer",
@@ -355,9 +206,7 @@ function Category() {
                   placeItems: "center",
                 }}
               >
-                <AutoStoriesIcon
-                  sx={{ fontSize: 22, color: "#8b5cf6" }}
-                />
+                <AutoStoriesIcon sx={{ fontSize: 22, color: "#8b5cf6" }} />
               </Box>
             </Box>
 
@@ -458,7 +307,7 @@ function Category() {
                   }}
                 >
                   <CardActionArea
-                    // onClick={() => navigate(`/topics/${topic.id}`)}
+                    onClick={() => navigate(`/topics/${topic.id}`)}
                     sx={{
                       height: "100%",
                       borderRadius: "20px",

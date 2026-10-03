@@ -6,10 +6,10 @@ import { AuthProvider } from "./context/AuthProvider.tsx";
 import { CssBaseline } from "@mui/material";
 
 createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-    <BrowserRouter>
+  <BrowserRouter>
+    <AuthProvider>
       <CssBaseline />
       <App />
-    </BrowserRouter>
-  </AuthProvider>,
+    </AuthProvider>
+  </BrowserRouter>,
 );

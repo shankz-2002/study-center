@@ -7,6 +7,7 @@ import ProtectedRouteLayout from "./layout/ProtectedRouteLayout";
 import Field from "./pages/privatepages/Field";
 import { ToastContainer } from "react-toastify";
 import Category from "./pages/privatepages/Category";
+import Topic from "./pages/privatepages/Topic";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route element={<ProtectedRouteLayout />}>
           <Route path="/fields/:id" element={<Field />} />
           <Route path="/categories/:id" element={<Category />} />
+          <Route path="/topics/:id" element={<Topic />} />
         </Route>
       </Routes>
     </>

@@ -5,6 +5,7 @@ import { Category } from '../entity/category.js';
 import { User } from '../entity/user.js';
 import { Topic } from '../entity/topic.js';
 import { Level } from '../entity/level.js';
+import { Learning } from '../entity/learning.js';
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -15,6 +16,6 @@ export const AppDataSource = new DataSource({
     database: process.env.DB_NAME,
     synchronize: true,
     logging: false,
-    entities: [Fields,Category,User,Topic,Level]
+    entities: [Fields,Category,User,Topic,Level,Learning]
 
 })
