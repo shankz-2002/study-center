@@ -3,31 +3,29 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Category } from "./category.js";
-import { Level } from "./level.js";
+import { Topic } from "./topic.js";
 
 @Entity()
-export class Topic {
+export class Level {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ type: "varchar" })
-  topicName: string;
+  levelName: string;
 
   @Column({ type: "varchar" })
   description: string;
 
+  @Column({ type: "int" })
+  order: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Category, (category) => category.topics, {
+  @ManyToOne(() => Topic, (topic) => topic.levels, {
     onDelete: "CASCADE",
   })
-  category: Category;
-
-  @OneToMany(() => Level, (level) => level.topic)
-  levels: Level[];
+  topic: Topic;
 }

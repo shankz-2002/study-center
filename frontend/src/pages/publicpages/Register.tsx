@@ -187,8 +187,6 @@
 
 // export default Register;
 
-
-
 import {
   Box,
   Button,
@@ -442,6 +440,17 @@ function Register() {
                 required
                 autoComplete="family-name"
                 sx={inputSx}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonOutlineOutlinedIcon
+                          sx={{ fontSize: 20, color: "#94a3b8" }}
+                        />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
             </Box>
 
@@ -603,9 +612,7 @@ function Register() {
               size="large"
               disabled={loading}
               disableElevation
-              endIcon={
-                !loading && <ArrowForwardIcon sx={{ fontSize: 18 }} />
-              }
+              endIcon={!loading && <ArrowForwardIcon sx={{ fontSize: 18 }} />}
               sx={{
                 mt: 0.5,
                 py: 1.4,

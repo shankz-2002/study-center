@@ -6,6 +6,7 @@ import cors from 'cors'
 import 'dotenv/config'
 import userRouter from './routes/user.route.js';
 import topicRouter from './routes/topic.route.js';
+import levelRouter from './routes/level.route.js';
 const app=express();
 app.use(cors({
     origin:process.env.FRONTEND_URL
@@ -17,6 +18,7 @@ app.use("/field",fieldRouter);
 app.use("/category",categoryRouter);
 app.use("/auth",userRouter);
 app.use("/topic",topicRouter)
+app.use("/level",levelRouter)
 
 app.use(errorHandler);
 
