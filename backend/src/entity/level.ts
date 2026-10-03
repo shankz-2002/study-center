@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { Topic } from "./topic.js";
 import { Learning } from "./learning.js";
+import { Question } from "./question.js";
 
 @Entity()
 export class Level {
@@ -33,4 +34,7 @@ export class Level {
 
   @OneToMany(() => Learning, (learning) => learning.level)
   learning: Learning[];
+
+  @OneToMany(() => Question, (question) => question.level)
+  questions: Question[];
 }

@@ -38,22 +38,20 @@ export class levelService {
 
   static deleteLevel = async (id: string) => {
     const level = await this.getLevel(id);
-    if (!level) {
-      throw new ApiError(404, "Level not found");
-    }
     await levelRepository.remove(level);
     return level;
   };
-  
-  static editLevel=async (id:string,levelName:string,description:string,order:number) => {
-    const level=await this.getLevel(id);
-    if(!level){
-        throw new ApiError(404,"Level not found")
-    }
-    level.levelName=levelName;
-    level.description=description;
-    level.order=order;
+
+  static editLevel = async (
+    id: string,
+    levelName: string,
+    description: string,
+    order: number,
+  ) => {
+    const level = await this.getLevel(id);
+    level.levelName = levelName;
+    level.description = description;
+    level.order = order;
     return await levelRepository.save(level);
-    
-  }
+  };
 }
