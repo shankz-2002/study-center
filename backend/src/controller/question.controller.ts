@@ -4,6 +4,7 @@ import type {
   CreateQuestionData,
   EditQuestionData,
 } from "../types/question.js";
+import type { SubmitAnswer } from "../types/answer.js";
 
 export class questionController {
   static createQuestion = async (req: Request, res: Response) => {
@@ -49,6 +50,16 @@ export class questionController {
     res.status(200).json({
       success: true,
       question,
+    });
+  };
+  static checkAnswer = async (req: Request, res: Response) => {
+    const id = String(req.params.id);
+    const answer: SubmitAnswer = req.body;
+
+    const result = await questionService.checkAnswer(id, answer);
+    res.status(200).json({
+      success: true,
+      result,
     });
   };
 }

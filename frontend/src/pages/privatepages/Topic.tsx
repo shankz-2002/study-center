@@ -4,16 +4,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getLevels } from "../../services/level";
 import type { ApiError } from "../../types/Error";
 import { toast } from "react-toastify";
-import { Box, CircularProgress, Typography, Chip } from "@mui/material";
+import { Box, CircularProgress, Typography, Chip, Divider } from "@mui/material";
 import LevelSideBar from "../../components/LevelSideBar";
 import LearningContent from "../../components/LearningContent";
+import Questions from "../../components/Questions";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
-import Questions from "../../components/Questions";
 
 function Topic() {
   const [loading, setLoading] = useState(false);
@@ -96,98 +96,98 @@ function Topic() {
     );
   }
 
-
-/* ---------------- No levels ---------------- */
-if (levels.length === 0) {
-  return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        background: pageBackground,
-        pt: { xs: 3, md: 5 },
-        pb: { xs: 8, md: 10 },
-      }}
-    >
-      {/* Back link */}
-      <Box sx={{ px: { xs: 2, md: 4 }, mb: 2 }}>
-        <Box
-          component="button"
-          onClick={() => navigate(-1)}
-          sx={{
-            all: "unset",
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 0.75,
-            px: 1.5,
-            py: 0.75,
-            borderRadius: "10px",
-            color: "#64748b",
-            fontSize: "0.85rem",
-            fontWeight: 600,
-            transition: "all 0.2s ease",
-            "&:hover": {
-              color: "#4f46e5",
-              backgroundColor: "rgba(99, 102, 241, 0.08)",
-            },
-          }}
-        >
-          <ArrowBackIcon sx={{ fontSize: 18 }} />
-          Back to topics
-        </Box>
-      </Box>
-
-      {/* Centered empty state */}
+  /* ---------------- No levels ---------------- */
+  if (levels.length === 0) {
+    return (
       <Box
         sx={{
-          minHeight: "calc(100vh - 200px)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          px: 4,
+          minHeight: "100vh",
+          background: pageBackground,
+          pt: { xs: 3, md: 5 },
+          pb: { xs: 8, md: 10 },
         }}
       >
-        <Box sx={{ textAlign: "center", maxWidth: 460 }}>
+        {/* Back link */}
+        <Box sx={{ px: { xs: 2, md: 4 }, mb: 2 }}>
           <Box
+            component="button"
+            onClick={() => navigate(-1)}
             sx={{
-              width: 72,
-              height: 72,
-              borderRadius: "20px",
-              background: brandGradientSoft,
-              color: "#8b5cf6",
-              display: "grid",
-              placeItems: "center",
-              mx: "auto",
-              mb: 2.5,
+              all: "unset",
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.75,
+              px: 1.5,
+              py: 0.75,
+              borderRadius: "10px",
+              color: "#64748b",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              transition: "all 0.2s ease",
+              "&:hover": {
+                color: "#4f46e5",
+                backgroundColor: "rgba(99, 102, 241, 0.08)",
+              },
             }}
           >
-            <FolderOpenOutlinedIcon sx={{ fontSize: 34 }} />
+            <ArrowBackIcon sx={{ fontSize: 18 }} />
+            Back to topics
           </Box>
+        </Box>
 
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              color: "#0f172a",
-              mb: 1,
-              letterSpacing: "-0.3px",
-            }}
-          >
-            No materials yet
-          </Typography>
+        {/* Centered empty state */}
+        <Box
+          sx={{
+            minHeight: "calc(100vh - 200px)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            px: 4,
+          }}
+        >
+          <Box sx={{ textAlign: "center", maxWidth: 460 }}>
+            <Box
+              sx={{
+                width: 72,
+                height: 72,
+                borderRadius: "20px",
+                background: brandGradientSoft,
+                color: "#8b5cf6",
+                display: "grid",
+                placeItems: "center",
+                mx: "auto",
+                mb: 2.5,
+              }}
+            >
+              <FolderOpenOutlinedIcon sx={{ fontSize: 34 }} />
+            </Box>
 
-          <Typography
-            variant="body2"
-            sx={{ color: "#64748b", lineHeight: 1.65 }}
-          >
-            This topic doesn&apos;t have any materials available right now.
-            Check back soon or explore a different topic.
-          </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                color: "#0f172a",
+                mb: 1,
+                letterSpacing: "-0.3px",
+              }}
+            >
+              No materials yet
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{ color: "#64748b", lineHeight: 1.65 }}
+            >
+              This topic doesn&apos;t have any materials available right now.
+              Check back soon or explore a different topic.
+            </Typography>
+          </Box>
         </Box>
       </Box>
-    </Box>
-  );
-}
+    );
+  }
+
   /* ---------------- Main layout ---------------- */
   return (
     <Box
@@ -276,31 +276,8 @@ if (levels.length === 0) {
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {selectedLevel ? (
             <>
-              {/* Header card for current level */}
-              <Box
-                sx={{
-                  position: "relative",
-                  borderRadius: "20px",
-                  background: "rgba(255, 255, 255, 0.85)",
-                  backdropFilter: "saturate(180%) blur(20px)",
-                  WebkitBackdropFilter: "saturate(180%) blur(20px)",
-                  border: "1px solid rgba(15, 23, 42, 0.06)",
-                  boxShadow:
-                    "0 20px 40px -30px rgba(99, 102, 241, 0.35), 0 8px 20px -12px rgba(139, 92, 246, 0.15)",
-                  p: { xs: 3, md: 4 },
-                  mb: 3,
-                  overflow: "hidden",
-                  "&::before": {
-                    content: '""',
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: "4px",
-                    background: brandGradient,
-                  },
-                }}
-              >
+              {/* ---------------- Level header (no card) ---------------- */}
+              <Box sx={{ mb: 4 }}>
                 <Chip
                   icon={<LayersOutlinedIcon sx={{ fontSize: 16 }} />}
                   label="Current level"
@@ -346,14 +323,14 @@ if (levels.length === 0) {
                   </Box>
 
                   <Typography
-                    variant="h4"
+                    variant="h3"
                     component="h1"
                     sx={{
                       fontWeight: 800,
-                      letterSpacing: "-0.9px",
-                      fontSize: { xs: "1.5rem", md: "1.85rem" },
+                      letterSpacing: "-1px",
+                      fontSize: { xs: "1.7rem", md: "2.1rem" },
                       color: "#0f172a",
-                      lineHeight: 1.2,
+                      lineHeight: 1.15,
                     }}
                   >
                     {selectedLevel.levelName}
@@ -375,7 +352,17 @@ if (levels.length === 0) {
 
               {/* Learning content */}
               <LearningContent levelId={selectedLevel.id} />
-              <Questions levelId={selectedLevel.id}/>
+
+              {/* Divider between learning content and practice questions */}
+              <Divider
+                sx={{
+                  my: { xs: 5, md: 6 },
+                  borderColor: "rgba(15, 23, 42, 0.08)",
+                }}
+              />
+
+              {/* Practice questions */}
+              <Questions levelId={selectedLevel.id} />
             </>
           ) : (
             <Box

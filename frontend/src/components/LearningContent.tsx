@@ -6,7 +6,7 @@ import type {
 import { getLearningContent } from "../services/learningContent";
 import type { ApiError } from "../types/Error";
 import { toast } from "react-toastify";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, Divider } from "@mui/material";
 
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
@@ -103,120 +103,151 @@ function LearningContent({ levelId }: LearningContentProps) {
     );
   }
 
-  /* ---------------- Content ---------------- */
+  /* ---------------- Content (single flowing page) ---------------- */
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-      {learning.map((learn) => (
+    <Box>
+      {/* ---------------- Section header ---------------- */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          mb: 1,
+        }}
+      >
         <Box
-          key={learn.id}
           sx={{
-            position: "relative",
-            borderRadius: "20px",
-            background: "rgba(255, 255, 255, 0.85)",
-            backdropFilter: "saturate(180%) blur(20px)",
-            WebkitBackdropFilter: "saturate(180%) blur(20px)",
-            border: "1px solid rgba(15, 23, 42, 0.06)",
+            width: 42,
+            height: 42,
+            borderRadius: "12px",
+            background: brandGradient,
+            display: "grid",
+            placeItems: "center",
+            color: "#fff",
+            flexShrink: 0,
             boxShadow:
-              "0 20px 40px -30px rgba(99, 102, 241, 0.28), 0 8px 20px -12px rgba(139, 92, 246, 0.12)",
-            p: { xs: 3, md: 3.5 },
-            overflow: "hidden",
-            transition:
-              "transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease",
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "4px",
-              background: brandGradient,
-              opacity: 0.85,
-            },
-            "&:hover": {
-              transform: "translateY(-3px)",
-              borderColor: "rgba(99, 102, 241, 0.20)",
-              boxShadow:
-                "0 24px 48px -28px rgba(99, 102, 241, 0.38), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
-            },
+              "0 10px 20px -8px rgba(99, 102, 241, 0.6), inset 0 1px 0 rgba(255,255,255,0.35)",
           }}
         >
-          {/* Header row: number badge + title */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 1.75,
-              mb: 2,
-            }}
-          >
-            <Box
-              sx={{
-                width: 44,
-                height: 44,
-                flexShrink: 0,
-                borderRadius: "12px",
-                background: brandGradient,
-                color: "#fff",
-                display: "grid",
-                placeItems: "center",
-                fontWeight: 800,
-                fontSize: "1rem",
-                letterSpacing: "-0.3px",
-                boxShadow:
-                  "0 10px 20px -10px rgba(99, 102, 241, 0.65), inset 0 1px 0 rgba(255,255,255,0.35)",
-              }}
-            >
-              {learn.order}
-            </Box>
+          <AutoStoriesIcon sx={{ fontSize: 22 }} />
+        </Box>
 
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography
-                variant="h6"
-                component="h2"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: "1.05rem", md: "1.15rem" },
-                  letterSpacing: "-0.4px",
-                  color: "#0f172a",
-                  lineHeight: 1.35,
-                }}
-              >
-                {learn.title}
-              </Typography>
-
-              <Box
-                sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  mt: 0.75,
-                  color: "#6366f1",
-                  fontSize: "0.72rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.4px",
-                  textTransform: "uppercase",
-                  opacity: 0.85,
-                }}
-              >
-                <MenuBookOutlinedIcon sx={{ fontSize: 14 }} />
-                Lesson
-              </Box>
-            </Box>
-          </Box>
-
-          {/* Body content */}
+        <Box>
           <Typography
+            variant="h5"
+            component="h2"
             sx={{
-              color: "#475569",
-              lineHeight: 1.85,
-              fontSize: { xs: "0.92rem", md: "0.98rem" },
-              whiteSpace: "pre-wrap",
+              fontWeight: 800,
+              letterSpacing: "-0.6px",
+              color: "#0f172a",
+              lineHeight: 1.2,
             }}
           >
-            {learn.content}
+            Learning content
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: "#64748b", fontWeight: 500, mt: 0.25 }}
+          >
+            {learning.length} lesson{learning.length === 1 ? "" : "s"} in this
+            level
           </Typography>
         </Box>
-      ))}
+      </Box>
+
+      {/* ---------------- Lessons (flowing, no cards) ---------------- */}
+      <Box sx={{ mt: 3 }}>
+        {learning.map((learn, index) => (
+          <Box key={learn.id}>
+            <Box sx={{ py: 4 }}>
+              {/* Lesson header row */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 1.75,
+                  mb: 2,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 38,
+                    height: 38,
+                    flexShrink: 0,
+                    borderRadius: "10px",
+                    background: "rgba(99, 102, 241, 0.10)",
+                    border: "1px solid rgba(99, 102, 241, 0.18)",
+                    color: "#4f46e5",
+                    display: "grid",
+                    placeItems: "center",
+                    fontWeight: 800,
+                    fontSize: "0.9rem",
+                  }}
+                >
+                  {learn.order}
+                </Box>
+
+                <Box sx={{ flex: 1, minWidth: 0, pt: 0.25 }}>
+                  <Typography
+                    component="h3"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: { xs: "1.1rem", md: "1.25rem" },
+                      letterSpacing: "-0.4px",
+                      color: "#0f172a",
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {learn.title}
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      mt: 0.5,
+                      color: "#6366f1",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.4px",
+                      textTransform: "uppercase",
+                      opacity: 0.85,
+                    }}
+                  >
+                    <MenuBookOutlinedIcon sx={{ fontSize: 14 }} />
+                    Lesson {index + 1} of {learning.length}
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Lesson body — indented to align with title, not number */}
+              <Box
+                sx={{
+                  pl: { xs: 0, md: 6.5 },
+                  pr: { xs: 0, md: 2 },
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "#475569",
+                    lineHeight: 1.9,
+                    fontSize: { xs: "0.95rem", md: "1rem" },
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {learn.content}
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Divider between lessons (not after the last) */}
+            {index < learning.length - 1 && (
+              <Divider sx={{ borderColor: "rgba(15, 23, 42, 0.08)" }} />
+            )}
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 }
