@@ -13,6 +13,7 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
+import Questions from "../../components/Questions";
 
 function Topic() {
   const [loading, setLoading] = useState(false);
@@ -374,6 +375,7 @@ if (levels.length === 0) {
 
               {/* Learning content */}
               <LearningContent levelId={selectedLevel.id} />
+              <Questions levelId={selectedLevel.id}/>
             </>
           ) : (
             <Box

@@ -31,17 +31,26 @@ export class questionService {
   };
   static getAllQuestions = async (id: string) => {
     await levelService.getLevel(id);
-    return await questionRepository.find({ where: { level: { id } } });
+    const questions = await questionRepository.find({
+      where: { level: { id } },
+    });
+    return questions.map(({ correctAnswer: _, ...question }) => question);
   };
   static getQuestion = async (id: string) => {
     const question = await questionRepository.findOne({ where: { id } });
     if (!question) {
       throw new ApiError(404, "Question not found");
     }
-    return question;
+    const { correctAnswer: _, ...newQuestion } = question;
+    return newQuestion;
   };
   static deleteQuestion = async (id: string) => {
-    const question = await this.getQuestion(id);
+    const question = await questionRepository.findOne({
+      where: { id },
+    });
+    if (!question) {
+      throw new ApiError(404, "Question not found");
+    }
     await questionRepository.remove(question);
     return question;
   };

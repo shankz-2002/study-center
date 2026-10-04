@@ -1,5 +1,4 @@
-import commonAPI from "./commonApi";
-const baseUrl=import.meta.env.VITE_BASE_URL;
+import commonAPI, { baseUrl } from "./commonApi";
 export const loginApi=async (form:object) => {
     return await commonAPI('POST',`${baseUrl}/auth/login`,form)
     
