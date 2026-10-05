@@ -4,8 +4,9 @@ import type {
   EditQuestionData,
 } from "../types/question.js";
 import { ApiError } from "../utils/ApiError.js";
-import { questionRepository } from "../utils/repository.js";
+import { progressRepository, questionRepository } from "../utils/repository.js";
 import { levelService } from "./level.service.js";
+import { levelProgressService } from "./levelProgress.service.js";
 
 export class questionService {
   static createQuestion = async (data: CreateQuestionData) => {
@@ -67,7 +68,20 @@ export class questionService {
     return await questionRepository.save(newQuestion);
   };
 
-  static checkAnswer = async (id: string, data: SubmitAnswer) => {
+  static checkAnswer = async (
+    userId: string,
+    id: string,
+    data: SubmitAnswer,
+  ) => {
+    const progress = await progressRepository.findOne({
+      where: {
+        user: { id: userId },
+        level: { id },
+      },
+    });
+    if (progress) {
+      throw new ApiError(409, "Already answerd the questions and passed");
+    }
     const questions = await questionRepository.find({
       where: {
         level: { id },
@@ -116,11 +130,18 @@ export class questionService {
         }
       }
     }
+    const percentage =
+      questions.length > 0 ? (score / questions.length) * 100 : 0;
+    const passed = percentage >= 80;
+    if (passed) {
+      await levelProgressService.createProgress(userId, id, score, percentage);
+    }
 
     return {
       score,
       total: questions.length,
-      percentage: questions.length > 0 ? (score / questions.length) * 100 : 0,
+      percentage,
+      passed,
     };
   };
 }

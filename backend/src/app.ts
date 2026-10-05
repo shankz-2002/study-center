@@ -9,6 +9,7 @@ import topicRouter from "./routes/topic.route.js";
 import levelRouter from "./routes/level.route.js";
 import learningRouter from "./routes/learning.route.js";
 import questionRouter from "./routes/question.route.js";
+import progressRouter from "./routes/progress.route.js";
 const app = express();
 app.use(
   cors({
@@ -24,7 +25,8 @@ app.use("/auth", userRouter);
 app.use("/topic", topicRouter);
 app.use("/level", levelRouter);
 app.use("/learning", learningRouter);
-app.use("/question",questionRouter)
+app.use("/question", questionRouter);
+app.use("/progress", progressRouter);
 
 app.use(errorHandler);
 

@@ -6,7 +6,7 @@ import { tokenUtil } from "../utils/token.js";
 export class userService {
   static registerUser = async (
     firstName: string,
-    lastName:string,
+    lastName: string,
     password: string,
     email: string,
   ) => {
@@ -27,16 +27,26 @@ export class userService {
   };
   static loginUser = async (email: string, password: string) => {
     const existingUser = await userRepository.findOne({ where: { email } });
-    if (!existingUser || !(await bcrpyt.compare(password, existingUser.password))) {
+    if (
+      !existingUser ||
+      !(await bcrpyt.compare(password, existingUser.password))
+    ) {
       throw new ApiError(401, "Email or Password Wrong");
     }
     const id = existingUser.id;
     const accessToken = await tokenUtil.createToken(id);
-    const { password:_,createdAt, ...user } = existingUser;
+    const { password: _, createdAt, ...user } = existingUser;
     const newUser = {
       user,
       accessToken,
     };
     return newUser;
+  };
+  static getUser = async (id: string) => {
+    const user = await userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    return user;
   };
 }

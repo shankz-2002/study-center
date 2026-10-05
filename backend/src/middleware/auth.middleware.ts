@@ -11,7 +11,7 @@ export class authMiddleware {
   ) => {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
-      throw new ApiError(401, "Unauthorized:Token is missing");
+      throw new ApiError(403, "Unauthorized:Token is missing");
     }
     const token = authHeader.split(" ")[1];
     try {
@@ -21,7 +21,7 @@ export class authMiddleware {
       };
       next();
     } catch (error) {
-      throw new ApiError(401, "Invalid or Expired Token");
+      throw new ApiError(403, "Invalid or Expired Token");
     }
   };
 }

@@ -5,6 +5,7 @@ import type {
   EditQuestionData,
 } from "../types/question.js";
 import type { SubmitAnswer } from "../types/answer.js";
+import type { AuthRequest } from "../types/authRequest.js";
 
 export class questionController {
   static createQuestion = async (req: Request, res: Response) => {
@@ -52,11 +53,12 @@ export class questionController {
       question,
     });
   };
-  static checkAnswer = async (req: Request, res: Response) => {
+  static checkAnswer = async (req: AuthRequest, res: Response) => {
     const id = String(req.params.id);
     const answer: SubmitAnswer = req.body;
+    const userId=String(req.user?.id)
 
-    const result = await questionService.checkAnswer(id, answer);
+    const result = await questionService.checkAnswer(userId,id, answer);
     res.status(200).json({
       success: true,
       result,

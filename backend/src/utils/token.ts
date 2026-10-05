@@ -4,7 +4,7 @@ const secretKey = process.env.SECRET_KEY!;
 
 export class tokenUtil {
   static createToken = async (id: string) => {
-    return jwt.sign({ id }, secretKey, { expiresIn: "1h" });
+    return jwt.sign({ id }, secretKey, { expiresIn: "20m" });
   };
   static verifyToken = async (token: string) => {
     return jwt.verify(token, secretKey) as { id: string };

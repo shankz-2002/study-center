@@ -20,6 +20,8 @@ import QuizOutlinedIcon from "@mui/icons-material/QuizOutlined";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
+import type { LevelProgress } from "../types/Progress";
+import { getProgress } from "../services/progress";
 
 function Questions({ levelId }: QuestionTypeProps) {
   const [loading, setLoading] = useState(false);
@@ -27,6 +29,7 @@ function Questions({ levelId }: QuestionTypeProps) {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [result, setResult] = useState<QuizResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [progress, setProgress] = useState<LevelProgress | null>(null);
 
   // Fetch questions
   useEffect(() => {
@@ -46,6 +49,23 @@ function Questions({ levelId }: QuestionTypeProps) {
     };
     fetchQuestions();
   }, [levelId]);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const response = await getProgress(levelId);
+        if (response?.data?.success) {
+          setProgress(response?.data?.progress);
+        }
+      } catch (error) {
+        const err = error as ApiError;
+        toast.error(err.data?.message || "Failed to fetch");
+      }
+    };
+    fetchProgress();
+  }, [levelId]);
+
+  const completed = progress !== null;
 
   // ---- Design tokens ----
   const brandGradient =
@@ -72,6 +92,13 @@ function Questions({ levelId }: QuestionTypeProps) {
       const response = await checkAnswer(levelId, answers);
       if (response?.data?.success) {
         setResult(response?.data?.result);
+        if (response.data.result.passed) {
+          setProgress({
+            score: response.data.result.score,
+            percentage: response.data.result.percentage,
+            completedAt: new Date().toISOString(),
+          });
+        }
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch (error) {
@@ -198,6 +225,35 @@ function Questions({ levelId }: QuestionTypeProps) {
           </Typography>
         </Box>
       </Box>
+
+      {completed && progress && (
+        <Box
+          sx={{
+            mt: 3,
+            mb: 4,
+            p: 3,
+            borderRadius: "20px",
+            background: "rgba(34, 197, 94, 0.08)",
+            border: "1px solid rgba(34, 197, 94, 0.2)",
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              color: "#166534",
+              mb: 0.5,
+            }}
+          >
+            Level Completed
+          </Typography>
+
+          <Typography color="text.secondary">
+            You already passed this level with a score of {progress.score} (
+            {progress.percentage}%).
+          </Typography>
+        </Box>
+      )}
 
       {/* ---------------- Result banner (after submit) ---------------- */}
       {result && (
@@ -331,6 +387,7 @@ function Questions({ levelId }: QuestionTypeProps) {
                       value={option}
                       control={
                         <Radio
+                          disabled={completed}
                           sx={{
                             color: "#94a3b8",
                             "&.Mui-checked": { color: "#6366f1" },
@@ -377,6 +434,7 @@ function Questions({ levelId }: QuestionTypeProps) {
                           key={option}
                           control={
                             <Checkbox
+                              disabled={completed}
                               checked={selected}
                               onChange={() =>
                                 handleMultipleSelectChange(question.id, option)
@@ -467,7 +525,7 @@ function Questions({ levelId }: QuestionTypeProps) {
           variant="contained"
           size="large"
           onClick={handleSubmit}
-          disabled={submitting}
+          disabled={submitting || completed}
           disableElevation
           sx={{
             px: 4,
