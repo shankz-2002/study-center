@@ -60,4 +60,17 @@ export class learningService {
     learning.order = order;
     return await learningRepository.save(learning);
   };
+  static getContents = async () => {
+    return await learningRepository.find({
+      relations: {
+        level: {
+          topic: {
+            category: {
+              field: true,
+            },
+          },
+        },
+      },
+    });
+  };
 }

@@ -14,6 +14,9 @@ import { AdminFields } from "./pages/admin/AdminFields";
 import AdminCategory from "./pages/admin/AdminCategory";
 import AdminTopic from "./pages/admin/AdminTopic";
 import AdminLevel from "./pages/admin/AdminLevel";
+import AdminContents from "./pages/admin/AdminContents";
+import AdminQuestions from "./pages/admin/AdminQuestions";
+import AdminUsers from "./pages/admin/AdminUsers";
 
 function App() {
   return (
@@ -43,7 +46,9 @@ function App() {
             <Route path="/admin/categories" element={<AdminCategory />} />
             <Route path="/admin/topics" element={<AdminTopic />} />
             <Route path="/admin/levels" element={<AdminLevel />} />
-            
+            <Route path="/admin/contents" element={<AdminContents />} />
+            <Route path="/admin/questions" element={<AdminQuestions />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
           </Route>
         </Route>
       </Routes>

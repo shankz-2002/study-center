@@ -2,65 +2,78 @@ import { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  CircularProgress,
-  Typography,
   Card,
   CardContent,
+  CircularProgress,
   Divider,
+  Typography,
 } from "@mui/material";
 import { toast } from "react-toastify";
 
-import type { Topic, TopicData } from "../../types/Topic";
-import type { Category } from "../../types/Category";
+import type {
+  LearningContentType,
+  LearningContentData,
+} from "../../types/LearningContent";
+
+import type { Level } from "../../types/Level";
 import type { ApiError } from "../../types/Error";
 
 import {
-  getTopics,
-  createTopic,
-  updateTopic,
-  deleteTopic,
-} from "../../services/topic";
+  getContents,
+  createContent,
+  updateContent,
+  deleteContent,
+} from "../../services/learningContent";
 
-import { getCategories } from "../../services/category";
+import { getAllLevels } from "../../services/level";
 
 import AdminModal from "../../components/admin/AdminModal";
 import type { FormField } from "../../types/AdminModal";
 
-function AdminTopic() {
+function AdminContents() {
   const [loading, setLoading] = useState(true);
 
-  const [topics, setTopics] = useState<Topic[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [contents, setContents] = useState<
+    LearningContentType[]
+  >([]);
+
+  const [levels, setLevels] = useState<Level[]>([]);
 
   const [open, setOpen] = useState(false);
 
-  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(
-    null
-  );
+  const [selectedContent, setSelectedContent] =
+    useState<LearningContentType | null>(null);
 
-  const [modalLoading, setModalLoading] = useState(false);
+  const [modalLoading, setModalLoading] =
+    useState(false);
 
   const formFields: FormField[] = [
     {
-      name: "topicName",
-      label: "Topic Name",
+      name: "title",
+      label: "Title",
       type: "text",
       required: true,
     },
     {
-      name: "description",
-      label: "Description",
+      name: "content",
+      label: "Content",
       type: "textarea",
       required: true,
     },
     {
-      name: "categoryId",
-      label: "Category",
+      name: "order",
+      label: "Order",
+      type: "number",
+      required: true,
+    },
+    {
+      name: "levelId",
+      label: "Level",
       type: "select",
       required: true,
-      options: categories.map((category) => ({
-        label: category.categoryName,
-        value: category.id,
+      options: levels.map((level) => ({
+        label: level.levelName,
+        value: level.id,
       })),
     },
   ];
@@ -68,24 +81,25 @@ function AdminTopic() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [topicsResponse, categoriesResponse] =
+        const [contentsResponse, levelsResponse] =
           await Promise.all([
-            getTopics(),
-            getCategories(),
+            getContents(),
+            getAllLevels(),
           ]);
 
-        if (topicsResponse.data.success) {
-          setTopics(topicsResponse.data.topics);
+        if (contentsResponse.data.success) {
+          setContents(contentsResponse.data.contents);
         }
 
-        if (categoriesResponse.data.success) {
-          setCategories(categoriesResponse.data.categories);
+        if (levelsResponse.data.success) {
+          setLevels(levelsResponse.data.levels);
         }
       } catch (error) {
         const err = error as ApiError;
 
         toast.error(
-          err.data?.message || "Failed to fetch topics"
+          err.data?.message ||
+            "Failed to fetch learning content"
         );
       } finally {
         setLoading(false);
@@ -96,18 +110,20 @@ function AdminTopic() {
   }, []);
 
   const handleCreate = () => {
-    setSelectedTopic(null);
+    setSelectedContent(null);
     setOpen(true);
   };
 
-  const handleEdit = (topic: Topic) => {
-    setSelectedTopic(topic);
+  const handleEdit = (
+    content: LearningContentType
+  ) => {
+    setSelectedContent(content);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setSelectedTopic(null);
+    setSelectedContent(null);
   };
 
   const handleSubmit = async (
@@ -116,45 +132,47 @@ function AdminTopic() {
     try {
       setModalLoading(true);
 
-      const topicData: TopicData = {
-        topicName: data.topicName as string,
-        description: data.description as string,
+      const contentData: LearningContentData = {
+        title: data.title as string,
+        content: data.content as string,
+        order: data.order as number,
       };
 
-      if (selectedTopic) {
-        await updateTopic(
-          selectedTopic.id,
-          topicData
+      if (selectedContent) {
+        await updateContent(
+          selectedContent.id,
+          contentData
         );
 
         toast.success(
-          "Topic updated successfully"
+          "Learning content updated successfully"
         );
       } else {
-        const categoryId = data.categoryId as string;
+        const levelId = data.levelId as string;
 
-        await createTopic(
-          topicData,
-          categoryId
+        await createContent(
+          contentData,
+          levelId
         );
 
         toast.success(
-          "Topic created successfully"
+          "Learning content created successfully"
         );
       }
 
       handleClose();
 
-      const response = await getTopics();
+      const response = await getContents();
 
       if (response.data.success) {
-        setTopics(response.data.topics);
+        setContents(response.data.contents);
       }
     } catch (error) {
       const err = error as ApiError;
 
       toast.error(
-        err.data?.message || "Failed to save topic"
+        err.data?.message ||
+          "Failed to save learning content"
       );
     } finally {
       setModalLoading(false);
@@ -163,7 +181,7 @@ function AdminTopic() {
 
   const handleDelete = async (id: string) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this topic?"
+      "Are you sure you want to delete this learning content?"
     );
 
     if (!confirmed) {
@@ -173,22 +191,23 @@ function AdminTopic() {
     try {
       setLoading(true);
 
-      await deleteTopic(id);
+      await deleteContent(id);
 
       toast.success(
-        "Topic deleted successfully"
+        "Learning content deleted successfully"
       );
 
-      const response = await getTopics();
+      const response = await getContents();
 
       if (response.data.success) {
-        setTopics(response.data.topics);
+        setContents(response.data.contents);
       }
     } catch (error) {
       const err = error as ApiError;
 
       toast.error(
-        err.data?.message || "Failed to delete topic"
+        err.data?.message ||
+          "Failed to delete learning content"
       );
     } finally {
       setLoading(false);
@@ -225,21 +244,21 @@ function AdminTopic() {
           variant="h4"
           sx={{ fontWeight: 700 }}
         >
-          Topics
+          Learning Content
         </Typography>
 
         <Button
           variant="contained"
           onClick={handleCreate}
         >
-          Create Topic
+          Create Content
         </Button>
       </Box>
 
-      {/* Topics */}
-      {topics.length === 0 ? (
+      {/* Content cards */}
+      {contents.length === 0 ? (
         <Typography color="text.secondary">
-          No topics found.
+          No learning content found.
         </Typography>
       ) : (
         <Box
@@ -252,8 +271,8 @@ function AdminTopic() {
             gap: 2,
           }}
         >
-          {topics.map((topic) => (
-            <Card key={topic.id}>
+          {contents.map((content) => (
+            <Card key={content.id}>
               <CardContent>
                 <Typography
                   variant="h6"
@@ -262,21 +281,53 @@ function AdminTopic() {
                     mb: 1,
                   }}
                 >
-                  {topic.topicName}
+                  {content.title}
                 </Typography>
 
                 <Typography
                   color="text.secondary"
                   sx={{ mb: 2 }}
                 >
-                  {topic.description}
+                  {content.content.length > 150
+                    ? `${content.content.substring(
+                        0,
+                        150
+                      )}...`
+                    : content.content}
                 </Typography>
 
                 <Divider sx={{ mb: 2 }} />
 
                 <Typography variant="body2">
+                  <strong>Order:</strong>{" "}
+                  {content.order}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 1 }}
+                >
+                  <strong>Level:</strong>{" "}
+                  {content.level?.levelName ||
+                    "Not assigned"}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 1 }}
+                >
+                  <strong>Topic:</strong>{" "}
+                  {content.level?.topic?.topicName ||
+                    "Not assigned"}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 1 }}
+                >
                   <strong>Category:</strong>{" "}
-                  {topic.category?.categoryName ||
+                  {content.level?.topic?.category
+                    ?.categoryName ||
                     "Not assigned"}
                 </Typography>
 
@@ -285,7 +336,8 @@ function AdminTopic() {
                   sx={{ mt: 1 }}
                 >
                   <strong>Field:</strong>{" "}
-                  {topic.category?.field?.fieldName ||
+                  {content.level?.topic?.category
+                    ?.field?.fieldName ||
                     "Not assigned"}
                 </Typography>
 
@@ -299,7 +351,7 @@ function AdminTopic() {
                   <Button
                     variant="outlined"
                     onClick={() =>
-                      handleEdit(topic)
+                      handleEdit(content)
                     }
                   >
                     Edit
@@ -309,7 +361,7 @@ function AdminTopic() {
                     variant="outlined"
                     color="error"
                     onClick={() =>
-                      handleDelete(topic.id)
+                      handleDelete(content.id)
                     }
                   >
                     Delete
@@ -323,23 +375,22 @@ function AdminTopic() {
 
       {/* Modal */}
       <AdminModal
-        key={selectedTopic?.id ?? "create"}
+        key={selectedContent?.id ?? "create"}
         open={open}
         title={
-          selectedTopic
-            ? "Edit Topic"
-            : "Create Topic"
+          selectedContent
+            ? "Edit Learning Content"
+            : "Create Learning Content"
         }
         fields={formFields}
         initialData={
-          selectedTopic
+          selectedContent
             ? {
-                topicName:
-                  selectedTopic.topicName,
-                description:
-                  selectedTopic.description,
-                categoryId:
-                  selectedTopic.category?.id ?? "",
+                title: selectedContent.title,
+                content: selectedContent.content,
+                order: selectedContent.order,
+                levelId:
+                  selectedContent.level?.id ?? "",
               }
             : undefined
         }
@@ -351,4 +402,4 @@ function AdminTopic() {
   );
 }
 
-export default AdminTopic;
+export default AdminContents;

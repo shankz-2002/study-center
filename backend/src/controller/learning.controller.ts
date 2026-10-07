@@ -54,4 +54,12 @@ export class learningController {
       learning,
     });
   };
+
+  static getContents = async (req: Request, res: Response) => {
+    const contents = await learningService.getContents();
+    res.status(200).json({
+      success: true,
+      contents,
+    });
+  };
 }

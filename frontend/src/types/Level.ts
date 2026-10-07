@@ -5,11 +5,17 @@ export interface Level {
   levelName: string;
   description: string;
   order: number;
-  topic:Topic
+  topic?: Topic;
 }
 
-export interface LevelSideBarProps{
-    levels:Level[];
-    selectedLevel:Level |null;
-    onSelectLevel:(level:Level)=>void
+export interface LevelSideBarProps {
+  levels: Level[];
+  selectedLevel: Level | null;
+  onSelectLevel: (level: Level) => void;
+}
+
+export interface LevelData {
+  levelName: string;
+  description: string;
+  order: number;
 }

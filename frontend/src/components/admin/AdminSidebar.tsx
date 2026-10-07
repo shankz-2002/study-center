@@ -13,7 +13,7 @@ const menuItems = [
   { label: "Categories", path: "/admin/categories" },
   { label: "Topics", path: "/admin/topics" },
   { label: "Levels", path: "/admin/levels" },
-  { label: "Learning Content", path: "/admin/content" },
+  { label: "Learning Content", path: "/admin/contents" },
   { label: "Questions", path: "/admin/questions" },
   { label: "Users", path: "/admin/users" },
 ];

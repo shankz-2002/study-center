@@ -7,10 +7,11 @@ import { levelControler } from "../controller/level.controller.js";
 import { learningController } from "../controller/learning.controller.js";
 import { questionController } from "../controller/question.controller.js";
 import { RoleType } from "../types/user.js";
+import { userController } from "../controller/user.controller.js";
 
 const adminRouter = express.Router();
-// adminRouter.use(authMiddleware.authenticate);
-// adminRouter.use(authMiddleware.authorize(RoleType.ADMIN));
+adminRouter.use(authMiddleware.authenticate);
+adminRouter.use(authMiddleware.authorize(RoleType.ADMIN));
 
 //fields
 adminRouter.post("/field", fieldController.createField);
@@ -26,24 +27,29 @@ adminRouter.put("/category/:id", categoryController.editCategory);
 //topic
 adminRouter.get("/topics",topicController.getTopics)
 adminRouter.post("/topic/:id", topicController.createTopic);
-adminRouter.delete("topic/:id", topicController.deleteTopic);
-adminRouter.put("topic/:id", topicController.editTopic);
+adminRouter.delete("/topic/:id", topicController.deleteTopic);
+adminRouter.put("/topic/:id", topicController.editTopic);
 
 //level
 adminRouter.get("/levels",levelControler.getLevels)
-adminRouter.post("/:id", levelControler.createLevel);
-adminRouter.delete("/:id", levelControler.deleteLevel);
-adminRouter.put("/:id", levelControler.editLevel);
+adminRouter.post("level/:id", levelControler.createLevel);
+adminRouter.delete("/level/:id", levelControler.deleteLevel);
+adminRouter.put("/level/:id", levelControler.editLevel);
 
 //learningContent
-
-adminRouter.post("/:id", learningController.createLearning);
-adminRouter.delete("/:id", learningController.deleteLearning);
-adminRouter.put("/:id", learningController.editLearning);
+adminRouter.get("/contents",learningController.getContents)
+adminRouter.post("/content/:id", learningController.createLearning);
+adminRouter.delete("/content/:id", learningController.deleteLearning);
+adminRouter.put("/content/:id", learningController.editLearning);
 
 //question
-adminRouter.post("/:id", questionController.createQuestion);
-adminRouter.delete("/:id", questionController.deleteQuestion);
-adminRouter.put("/:id", questionController.editQuestion);
+adminRouter.get("/questions",questionController.getQuestions)
+adminRouter.post("/question/:id", questionController.createQuestion);
+adminRouter.delete("/question/:id", questionController.deleteQuestion);
+adminRouter.put("/question/:id", questionController.editQuestion);
 
+//user
+adminRouter.get("/users",userController.getUsers)
+adminRouter.put("/user/:id",userController.editUser)
+adminRouter.delete("/user/:id",userController.deleteUser)
 export default adminRouter;

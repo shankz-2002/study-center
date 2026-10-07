@@ -144,4 +144,20 @@ export class questionService {
       passed,
     };
   };
+  static getQuestions = async () => {
+    return await questionRepository.find({
+      relations: {
+        level: {
+          topic: {
+            category: {
+              field: true,
+            },
+          },
+        },
+      },
+      order: {
+        order: "ASC",
+      },
+    });
+  };
 }

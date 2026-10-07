@@ -1,5 +1,9 @@
 import { ApiError } from "../utils/ApiError.js";
-import { levelRepository, topicRepository } from "../utils/repository.js";
+import {
+  learningRepository,
+  levelRepository,
+  topicRepository,
+} from "../utils/repository.js";
 
 export class levelService {
   static createLevel = async (
@@ -55,13 +59,16 @@ export class levelService {
     return await levelRepository.save(level);
   };
   static getLevels = async () => {
-    return await levelRepository.findOne({
+    return await levelRepository.find({
       relations: {
         topic: {
           category: {
             field: true,
           },
         },
+      },
+      order: {
+        order: "ASC",
       },
     });
   };
