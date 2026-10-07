@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
-import type { Level } from "../../types/Level";
+import type { Level } from "../../../types/Level";
 import { useNavigate, useParams } from "react-router-dom";
-import { getLevels } from "../../services/level";
-import type { ApiError } from "../../types/Error";
+import { getLevels } from "../../../services/level";
+import type { ApiError } from "../../../types/Error";
 import { toast } from "react-toastify";
-import { Box, CircularProgress, Typography, Chip, Divider } from "@mui/material";
-import LevelSideBar from "../../components/LevelSideBar";
-import LearningContent from "../../components/LearningContent";
-import Questions from "../../components/Questions";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Chip,
+  Divider,
+} from "@mui/material";
+import LearningContent from "../../../components/user/LearningContent";
+import Questions from "../../../components/user/Questions";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
+import LevelSideBar from "../../../components/user/LevelSideBar";
 
 function Topic() {
   const [loading, setLoading] = useState(false);

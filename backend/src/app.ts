@@ -10,6 +10,7 @@ import levelRouter from "./routes/level.route.js";
 import learningRouter from "./routes/learning.route.js";
 import questionRouter from "./routes/question.route.js";
 import progressRouter from "./routes/progress.route.js";
+import adminRouter from "./routes/admin.route.js";
 const app = express();
 app.use(
   cors({
@@ -19,6 +20,7 @@ app.use(
 
 app.use(express.json());
 
+app.use("/admin",adminRouter)
 app.use("/field", fieldRouter);
 app.use("/category", categoryRouter);
 app.use("/auth", userRouter);

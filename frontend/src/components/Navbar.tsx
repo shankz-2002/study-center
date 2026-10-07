@@ -10,11 +10,11 @@ import {
   Tooltip,
   Divider,
 } from "@mui/material";
-import { useAuth } from "../context/useAuth";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import { useAuth } from "../context/useAuth";
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -156,104 +156,92 @@ function Navbar() {
             </Button>
 
             {user ? (
-              <>
-                <Button
-                  href="/profile"
-                  startIcon={<PersonIcon sx={{ fontSize: 18 }} />}
-                  sx={navButtonSx}
-                >
-                  Profile
-                </Button>
+              user.role === "ADMIN" ? (
+                // Admin navbar
+                <>
+                  <Button href="/admin/dashboard" sx={navButtonSx}>
+                    Admin Dashboard
+                  </Button>
 
-                <Divider
-                  orientation="vertical"
-                  flexItem
-                  sx={{ mx: 1, my: 2, borderColor: "rgba(15, 23, 42, 0.08)" }}
-                />
+                  <Tooltip title="Logout" arrow>
+                    <IconButton onClick={logout}>
+                      <LogoutIcon sx={{ fontSize: 20 }} />
+                    </IconButton>
+                  </Tooltip>
+                  <Button href="/admin/field">
 
-                {/* User avatar with gradient ring */}
-                <Tooltip
-                  title={user?.firstName || user?.firstName || "User"}
-                  arrow
-                >
-                  <Box
-                    sx={{
-                      position: "relative",
-                      display: "inline-flex",
-                      p: "2px",
-                      borderRadius: "50%",
-                      background: brandGradient,
-                      cursor: "pointer",
-                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        boxShadow: "0 6px 18px -6px rgba(139, 92, 246, 0.6)",
-                      },
-                    }}
+                  </Button>
+                </>
+              ) : (
+                // Normal user navbar
+                <>
+                  <Button
+                    href="/profile"
+                    startIcon={<PersonIcon sx={{ fontSize: 18 }} />}
+                    sx={navButtonSx}
                   >
-                    <Avatar
+                    Profile
+                  </Button>
+
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    sx={{
+                      mx: 1,
+                      my: 2,
+                      borderColor: "rgba(15, 23, 42, 0.08)",
+                    }}
+                  />
+
+                  <Tooltip title={user.firstName || "User"} arrow>
+                    <Box
                       sx={{
-                        width: 34,
-                        height: 34,
-                        bgcolor: "#fff",
-                        color: "#4f46e5",
-                        fontSize: "0.9rem",
-                        fontWeight: 700,
-                        border: "2px solid #fff",
+                        position: "relative",
+                        display: "inline-flex",
+                        p: "2px",
+                        borderRadius: "50%",
+                        background: brandGradient,
+                        cursor: "pointer",
                       }}
                     >
-                      {userInitial}
-                    </Avatar>
-                  </Box>
-                </Tooltip>
+                      <Avatar
+                        sx={{
+                          width: 34,
+                          height: 34,
+                          bgcolor: "#fff",
+                          color: "#4f46e5",
+                          fontSize: "0.9rem",
+                          fontWeight: 700,
+                          border: "2px solid #fff",
+                        }}
+                      >
+                        {userInitial}
+                      </Avatar>
+                    </Box>
+                  </Tooltip>
 
-                <Tooltip title="Logout" arrow>
-                  <IconButton
-                    onClick={logout}
-                    sx={{
-                      ml: 0.5,
-                      color: "#64748b",
-                      borderRadius: "12px",
-                      p: 1.1,
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        backgroundColor: "rgba(244, 63, 94, 0.08)",
-                        color: "#e11d48",
-                        transform: "translateY(-1px)",
-                      },
-                    }}
-                  >
-                    <LogoutIcon sx={{ fontSize: 20 }} />
-                  </IconButton>
-                </Tooltip>
-              </>
+                  <Tooltip title="Logout" arrow>
+                    <IconButton onClick={logout}>
+                      <LogoutIcon sx={{ fontSize: 20 }} />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )
             ) : (
+              // Logged-out navbar
               <Button
                 href="/login"
                 variant="contained"
                 disableElevation
                 sx={{
                   ml: 1,
-                  position: "relative",
                   background: brandGradient,
-                  backgroundSize: "200% 200%",
                   fontWeight: 700,
-                  fontSize: "0.875rem",
-                  letterSpacing: "-0.1px",
                   textTransform: "none",
                   borderRadius: "12px",
                   px: 3,
                   py: 1.1,
                   color: "#fff",
-                  boxShadow:
-                    "0 8px 20px -8px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    backgroundPosition: "100% 50%",
-                    boxShadow:
-                      "0 12px 28px -8px rgba(139, 92, 246, 0.8), inset 0 1px 0 rgba(255,255,255,0.3)",
-                    transform: "translateY(-1px)",
-                  },
                 }}
               >
                 Get Started

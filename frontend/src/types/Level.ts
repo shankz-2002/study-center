@@ -1,8 +1,11 @@
+import type { Topic } from "./Topic";
+
 export interface Level {
   id: string;
   levelName: string;
   description: string;
   order: number;
+  topic:Topic
 }
 
 export interface LevelSideBarProps{

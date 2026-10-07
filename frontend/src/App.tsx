@@ -1,13 +1,19 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import Home from "./pages/publicpages/Home";
-import Register from "./pages/publicpages/Register";
-import Login from "./pages/publicpages/Login";
-import Navbar from "./components/Navbar";
+import Home from "./pages/user/publicpages/Home";
+import Register from "./pages/user/publicpages/Register";
+import Login from "./pages/user/publicpages/Login";
 import ProtectedRouteLayout from "./layout/ProtectedRouteLayout";
-import Field from "./pages/privatepages/Field";
+import Field from "./pages/user/privatepages/Field";
 import { ToastContainer } from "react-toastify";
-import Category from "./pages/privatepages/Category";
-import Topic from "./pages/privatepages/Topic";
+import Category from "./pages/user/privatepages/Category";
+import Topic from "./pages/user/privatepages/Topic";
+import Navbar from "./components/Navbar";
+import AdminDashBoard from "./pages/admin/AdminDashBoard";
+import AdminLayout from "./layout/AdminLayout";
+import { AdminFields } from "./pages/admin/AdminFields";
+import AdminCategory from "./pages/admin/AdminCategory";
+import AdminTopic from "./pages/admin/AdminTopic";
+import AdminLevel from "./pages/admin/AdminLevel";
 
 function App() {
   return (
@@ -22,10 +28,23 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
-        <Route element={<ProtectedRouteLayout />}>
+        <Route
+          element={<ProtectedRouteLayout allowedRoles={["ADMIN", "USER"]} />}
+        >
           <Route path="/fields/:id" element={<Field />} />
           <Route path="/categories/:id" element={<Category />} />
           <Route path="/topics/:id" element={<Topic />} />
+        </Route>
+
+        <Route element={<ProtectedRouteLayout allowedRoles={["ADMIN"]} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<AdminDashBoard />} />
+            <Route path="/admin/fields" element={<AdminFields />} />
+            <Route path="/admin/categories" element={<AdminCategory />} />
+            <Route path="/admin/topics" element={<AdminTopic />} />
+            <Route path="/admin/levels" element={<AdminLevel />} />
+            
+          </Route>
         </Route>
       </Routes>
     </>

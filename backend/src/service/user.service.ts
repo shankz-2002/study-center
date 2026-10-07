@@ -34,7 +34,8 @@ export class userService {
       throw new ApiError(401, "Email or Password Wrong");
     }
     const id = existingUser.id;
-    const accessToken = await tokenUtil.createToken(id);
+    const role=existingUser.role
+    const accessToken = await tokenUtil.createToken(id,role);
     const { password: _, createdAt, ...user } = existingUser;
     const newUser = {
       user,

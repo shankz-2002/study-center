@@ -58,4 +58,13 @@ export class topicService {
     topic.description = description;
     return await topicRepository.save(topic);
   };
+  static getTopics = async () => {
+    return await topicRepository.find({
+      relations: {
+        category: {
+          field: true,
+        },
+      },
+    });
+  };
 }

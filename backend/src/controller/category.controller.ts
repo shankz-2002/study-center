@@ -69,4 +69,11 @@ export class categoryController {
       updateCategory,
     });
   };
+  static getCategories = async (req: Request, res: Response) => {
+    const categories = await categoryService.getCategories();
+    res.status(200).json({
+      success: true,
+      categories,
+    });
+  };
 }

@@ -3,10 +3,8 @@ import { learningController } from "../controller/learning.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 const learningRouter = express.Router();
 learningRouter.use(authMiddleware.authenticate);
-learningRouter.post("/:id", learningController.createLearning);
+
 learningRouter.get("/:id", learningController.getAllLearning);
 learningRouter.get("/:id/learning", learningController.getLearning);
-learningRouter.delete("/:id", learningController.deleteLearning);
-learningRouter.put("/:id", learningController.editLearning);
 
 export default learningRouter;

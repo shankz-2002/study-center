@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { loginApi } from "../../services/auth";
-import { useAuth } from "../../context/useAuth";
+import { loginApi } from "../../../services/auth";
+import { useAuth } from "../../../context/useAuth";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -13,7 +13,7 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import type { ApiError } from "../../types/Error";
+import type { ApiError } from "../../../types/Error";
 import { toast } from "react-toastify";
 
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -50,8 +50,11 @@ function Login() {
       if (response.data.success) {
         toast.success("Login successful");
         login(response.data.result.user, response.data.result.accessToken);
-
-        navigate("/home");
+        if (response?.data.result.user.role == "ADMIN") {
+          navigate("/admin/dashboard");
+        } else if (response?.data.result.user.role == "USER") {
+          navigate("/home");
+        }
       }
     } catch (error) {
       const err = error as ApiError;

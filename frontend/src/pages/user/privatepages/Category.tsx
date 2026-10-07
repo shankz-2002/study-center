@@ -13,50 +13,50 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import type { ApiError } from "../../types/Error";
-import type { Category } from "../../types/Category";
+import type { Topic } from "../../../types/Topic";
+import type { ApiError } from "../../../types/Error";
 
-import { getAllCategories } from "../../services/category";
+import { getAllTopics } from "../../../services/topic";
 
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import TopicOutlinedIcon from "@mui/icons-material/TopicOutlined";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import ExploreIcon from "@mui/icons-material/Explore";
 
-function Field() {
-  const [categories, setCategories] = useState<Category[]>([]);
+function Category() {
   const [loading, setLoading] = useState(false);
+  const [topics, setTopics] = useState<Topic[]>([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchTopics = async () => {
       try {
         setLoading(true);
 
         if (id) {
-          const response = await getAllCategories(id);
+          const response = await getAllTopics(id);
 
           if (response.data.success) {
-            setCategories(response.data.allCategories);
+            setTopics(response.data.topics);
           }
         }
       } catch (error) {
         const err = error as ApiError;
 
-        toast.error(err.data?.message || "Failed to fetch categories");
+        toast.error(err.data?.message || "Failed to fetch topics");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCategories();
+    fetchTopics();
   }, [id]);
 
-  // ---- Design tokens (match Navbar + Home + Login/Register) ----
+  // ---- Design tokens (match Navbar + Home + Field + Auth) ----
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
   const brandGradientSoft =
@@ -77,10 +77,10 @@ function Field() {
       }}
     >
       <Container maxWidth="lg">
-        {/* ---------------- Back to Home ---------------- */}
+        {/* ---------------- Back to categories ---------------- */}
         <Box
           component="button"
-          onClick={() => navigate("/home")}
+          onClick={() => navigate(-1)}
           sx={{
             all: "unset",
             cursor: "pointer",
@@ -102,7 +102,7 @@ function Field() {
           }}
         >
           <ArrowBackIcon sx={{ fontSize: 18 }} />
-          Back to fields
+          Back to categories
         </Box>
 
         {/* ---------------- Hero / Header ---------------- */}
@@ -115,7 +115,7 @@ function Field() {
           {/* Eyebrow chip */}
           <Chip
             icon={<ExploreIcon sx={{ fontSize: 16 }} />}
-            label="Dive into a category"
+            label="Pick a topic to begin"
             size="small"
             sx={{
               mb: 3,
@@ -155,7 +155,7 @@ function Field() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Categories
+              Topics
             </Box>
           </Typography>
 
@@ -170,7 +170,7 @@ function Field() {
               lineHeight: 1.7,
             }}
           >
-            Pick a category and continue building your skills — step by step.
+            Choose a topic and start learning — one focused step at a time.
           </Typography>
         </Box>
 
@@ -213,10 +213,10 @@ function Field() {
               variant="body2"
               sx={{ color: "#94a3b8", fontWeight: 500 }}
             >
-              Loading categories…
+              Loading topics…
             </Typography>
           </Box>
-        ) : categories.length === 0 ? (
+        ) : topics.length === 0 ? (
           /* ---------------- Empty state ---------------- */
           <Box
             sx={{
@@ -252,22 +252,22 @@ function Field() {
                 letterSpacing: "-0.3px",
               }}
             >
-              No categories yet
+              No topics yet
             </Typography>
 
             <Typography
               variant="body2"
               sx={{ color: "#64748b", lineHeight: 1.65 }}
             >
-              This field doesn&apos;t have any categories available right now.
-              Check back soon or explore a different field.
+              This category doesn&apos;t have any topics available right now.
+              Check back soon or explore a different category.
             </Typography>
           </Box>
         ) : (
-          /* ---------------- Categories grid ---------------- */
+          /* ---------------- Topics grid ---------------- */
           <Grid container spacing={{ xs: 2.5, md: 3 }}>
-            {categories.map((category) => (
-              <Grid key={category.id} size={{ xs: 12, sm: 6, md: 4 }}>
+            {topics.map((topic) => (
+              <Grid key={topic.id} size={{ xs: 12, sm: 6, md: 4 }}>
                 <Card
                   elevation={0}
                   sx={{
@@ -293,12 +293,12 @@ function Field() {
                       transform: "translateY(-6px)",
                       borderColor: "rgba(99, 102, 241, 0.25)",
                       boxShadow: cardHoverShadow,
-                      "& .category-icon-wrap": {
+                      "& .topic-icon-wrap": {
                         background: brandGradient,
                         color: "#fff",
                         transform: "scale(1.06) rotate(-3deg)",
                       },
-                      "& .category-arrow": {
+                      "& .topic-arrow": {
                         transform: "translateX(4px)",
                         opacity: 1,
                       },
@@ -306,7 +306,7 @@ function Field() {
                   }}
                 >
                   <CardActionArea
-                    onClick={() => navigate(`/categories/${category.id}`)}
+                    onClick={() => navigate(`/topics/${topic.id}`)}
                     sx={{
                       height: "100%",
                       borderRadius: "20px",
@@ -327,7 +327,7 @@ function Field() {
                     >
                       {/* Icon bubble */}
                       <Box
-                        className="category-icon-wrap"
+                        className="topic-icon-wrap"
                         sx={{
                           width: 52,
                           height: 52,
@@ -340,10 +340,10 @@ function Field() {
                             "background 0.28s ease, color 0.28s ease, transform 0.28s ease",
                         }}
                       >
-                        <CategoryOutlinedIcon sx={{ fontSize: 26 }} />
+                        <TopicOutlinedIcon sx={{ fontSize: 26 }} />
                       </Box>
 
-                      {/* Category name */}
+                      {/* Topic name */}
                       <Typography
                         variant="h6"
                         component="h2"
@@ -355,7 +355,7 @@ function Field() {
                           lineHeight: 1.35,
                         }}
                       >
-                        {category.categoryName}
+                        {topic.topicName}
                       </Typography>
 
                       {/* Description */}
@@ -371,7 +371,7 @@ function Field() {
                           overflow: "hidden",
                         }}
                       >
-                        {category.description}
+                        {topic.description}
                       </Typography>
 
                       {/* Footer CTA */}
@@ -387,9 +387,9 @@ function Field() {
                           letterSpacing: "-0.1px",
                         }}
                       >
-                        <span>Explore</span>
+                        <span>Start learning</span>
                         <ArrowForwardIcon
-                          className="category-arrow"
+                          className="topic-arrow"
                           sx={{
                             fontSize: 16,
                             transition: "transform 0.25s ease",
@@ -409,4 +409,4 @@ function Field() {
   );
 }
 
-export default Field;
+export default Category;

@@ -54,4 +54,15 @@ export class levelService {
     level.order = order;
     return await levelRepository.save(level);
   };
+  static getLevels = async () => {
+    return await levelRepository.findOne({
+      relations: {
+        topic: {
+          category: {
+            field: true,
+          },
+        },
+      },
+    });
+  };
 }

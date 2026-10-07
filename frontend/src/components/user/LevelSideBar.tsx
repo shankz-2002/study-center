@@ -1,4 +1,3 @@
-import type { LevelSideBarProps } from "../types/Level";
 import {
   Box,
   List,
@@ -10,6 +9,7 @@ import {
 
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import type { LevelSideBarProps } from "../../types/Level";
 
 function LevelSideBar({
   levels,

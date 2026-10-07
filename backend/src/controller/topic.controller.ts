@@ -62,4 +62,11 @@ export class topicController {
       topic,
     });
   };
+  static getTopics = async (rqe: Request, res: Response) => {
+    const topics = await topicService.getTopics();
+    res.status(200).json({
+      success: true,
+      topics,
+    });
+  };
 }

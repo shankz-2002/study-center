@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from "typeorm";
+
 import { User } from "./user.js";
 import { Level } from "./level.js";
 
@@ -25,17 +26,12 @@ export class UserLevelProgress {
   })
   level: Level;
 
+  @Column({ type: "int" })
+  score: number;
 
-
-  @Column({ type: "int", nullable: true })
-  score: number | null;
-
-  @Column({ type: "float", nullable: true })
-  percentage: number | null;
-
-  @Column({ type: "timestamp", nullable: true })
-  completedAt: Date | null;
+  @Column({ type: "float" })
+  percentage: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  completedAt: Date;
 }

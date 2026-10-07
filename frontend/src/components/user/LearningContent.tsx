@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import type {
   LearningContentProps,
   LearningContentType,
-} from "../types/LearningContent";
-import { getLearningContent } from "../services/learningContent";
-import type { ApiError } from "../types/Error";
+} from "../../types/LearningContent";
+import { getLearningContent } from "../../services/learningContent";
+import type { ApiError } from "../../types/Error";
 import { toast } from "react-toastify";
 import { Box, CircularProgress, Typography, Divider } from "@mui/material";
 

@@ -13,9 +13,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { getFields } from "../../services/field";
-import type { ApiError } from "../../types/Error";
-import type { Field } from "../../types/Field";
+import { getFields } from "../../../services/field";
+import type { ApiError } from "../../../types/Error";
+import type { Field } from "../../../types/Field";
 
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import SchoolIcon from "@mui/icons-material/School";

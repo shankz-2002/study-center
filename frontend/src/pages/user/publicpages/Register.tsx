@@ -199,10 +199,10 @@ import {
   Divider,
 } from "@mui/material";
 import { useState } from "react";
-import { registerApi } from "../../services/auth";
+import { registerApi } from "../../../services/auth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import type { ApiError } from "../../types/Error";
+import type { ApiError } from "../../../types/Error";
 
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";

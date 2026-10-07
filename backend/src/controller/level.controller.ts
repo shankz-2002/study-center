@@ -54,4 +54,11 @@ export class levelControler {
       level,
     });
   };
+  static getLevels = async (req:Request, res: Response) => {
+    const levels = await levelService.getLevels();
+    res.status(200).json({
+      success: true,
+      levels,
+    });
+  };
 }

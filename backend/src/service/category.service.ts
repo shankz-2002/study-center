@@ -45,4 +45,9 @@ export class categoryService {
   static getCategory = async (id: string) => {
     return categoryRepository.findOne({ where: { id } });
   };
+  static getCategories = async () => {
+    return await categoryRepository.find({
+      relations: { field: true },
+    });
+  };
 }

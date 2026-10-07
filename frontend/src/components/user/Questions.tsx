@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { Question, QuestionTypeProps } from "../types/Question";
-import { checkAnswer, getQuestions } from "../services/question";
-import type { ApiError } from "../types/Error";
+import type { Question, QuestionTypeProps } from "../../types/Question";
+import { checkAnswer, getQuestions } from "../../services/question";
+import type { ApiError } from "../../types/Error";
 import { toast } from "react-toastify";
 import {
   Box,
@@ -14,14 +14,14 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import type { QuizResult } from "../types/Answer";
+import type { QuizResult } from "../../types/Answer";
 
 import QuizOutlinedIcon from "@mui/icons-material/QuizOutlined";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
-import type { LevelProgress } from "../types/Progress";
-import { getProgress } from "../services/progress";
+import type { LevelProgress } from "../../types/Progress";
+import { getProgress } from "../../services/progress";
 
 function Questions({ levelId }: QuestionTypeProps) {
   const [loading, setLoading] = useState(false);
