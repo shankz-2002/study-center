@@ -17,6 +17,8 @@ import AdminLevel from "./pages/admin/AdminLevel";
 import AdminContents from "./pages/admin/AdminContents";
 import AdminQuestions from "./pages/admin/AdminQuestions";
 import AdminUsers from "./pages/admin/AdminUsers";
+import ForgottenPassword from "./pages/user/publicpages/ForgottenPassword";
+import Profile from "./pages/user/privatepages/Profile";
 
 function App() {
   return (
@@ -30,10 +32,12 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgottenPassword/>}/>
 
         <Route
           element={<ProtectedRouteLayout allowedRoles={["ADMIN", "USER"]} />}
         >
+          <Route path="/profile" element={<Profile/>}/>
           <Route path="/fields/:id" element={<Field />} />
           <Route path="/categories/:id" element={<Category />} />
           <Route path="/topics/:id" element={<Topic />} />
