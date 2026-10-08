@@ -15,3 +15,6 @@ export const updateTopic = async (id: string, data: TopicData) => {
 export const deleteTopic = async (id: string) => {
   return await commonAPI("DELETE", `${baseUrl}/admin/topic/${id}`);
 };
+export const checkTopicCompletion = async (id: string) => {
+  return await commonAPI("GET", `${baseUrl}/topic/${id}/completion`);
+};

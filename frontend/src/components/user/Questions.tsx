@@ -22,8 +22,9 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
 import type { LevelProgress } from "../../types/Progress";
 import { getProgress } from "../../services/progress";
+import { checkTopicCompletion } from "../../services/topic";
 
-function Questions({ levelId }: QuestionTypeProps) {
+function Questions({ levelId, topicId, onTopicCompleted }: QuestionTypeProps) {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -54,14 +55,16 @@ function Questions({ levelId }: QuestionTypeProps) {
     const fetchProgress = async () => {
       try {
         const response = await getProgress(levelId);
+
         if (response?.data?.success) {
-          setProgress(response?.data?.progress);
+          setProgress(response.data.progress);
         }
       } catch (error) {
         const err = error as ApiError;
         toast.error(err.data?.message || "Failed to fetch");
       }
     };
+
     fetchProgress();
   }, [levelId]);
 
@@ -98,6 +101,13 @@ function Questions({ levelId }: QuestionTypeProps) {
             percentage: response.data.result.percentage,
             completedAt: new Date().toISOString(),
           });
+
+          const completionResponse = await checkTopicCompletion(topicId);
+          console.log("thisnis the topic completion check", completionResponse);
+
+          if (completionResponse.data.completed) {
+            onTopicCompleted(completionResponse.data.completion);
+          }
         }
         window.scrollTo({ top: 0, behavior: "smooth" });
       }

@@ -20,6 +20,9 @@ import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
 import LevelSideBar from "../../../components/user/LevelSideBar";
+import type { UserTopicCompletion } from "../../../types/Topic";
+import TopicCompletion from "../../../components/user/TopicCompletion";
+import { checkTopicCompletion } from "../../../services/topic";
 
 function Topic() {
   const [loading, setLoading] = useState(false);
@@ -27,6 +30,8 @@ function Topic() {
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [topicCompletion, setTopicCompletion] =
+    useState<UserTopicCompletion | null>(null);
 
   useEffect(() => {
     const fetchLevels = async () => {
@@ -49,6 +54,26 @@ function Topic() {
       }
     };
     fetchLevels();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchTopicCompletion = async () => {
+      try {
+        const response = await checkTopicCompletion(id!);
+
+        if (response?.data?.success && response.data.completed) {
+          setTopicCompletion(response.data.completion);
+        }
+      } catch (error) {
+        const err = error as ApiError;
+
+        toast.error(err.data?.message || "Failed to fetch topic completion");
+      }
+    };
+
+    if (id) {
+      fetchTopicCompletion();
+    }
   }, [id]);
 
   const brandGradient =
@@ -368,7 +393,15 @@ function Topic() {
               />
 
               {/* Practice questions */}
-              <Questions levelId={selectedLevel.id} />
+              <Questions
+                key={selectedLevel.id}
+                levelId={selectedLevel.id}
+                topicId={id!}
+                onTopicCompleted={setTopicCompletion}
+              />
+              {topicCompletion && (
+                <TopicCompletion completion={topicCompletion} />
+              )}
             </>
           ) : (
             <Box

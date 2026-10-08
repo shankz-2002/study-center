@@ -7,6 +7,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { progressRepository, questionRepository } from "../utils/repository.js";
 import { levelService } from "./level.service.js";
 import { levelProgressService } from "./levelProgress.service.js";
+import { UserTopicCompletionService } from "./userLevelCompletion.service.js";
 
 export class questionService {
   static createQuestion = async (data: CreateQuestionData) => {
@@ -135,6 +136,7 @@ export class questionService {
     const passed = percentage >= 80;
     if (passed) {
       await levelProgressService.createProgress(userId, id, score, percentage);
+      await UserTopicCompletionService.createCompletion(userId,id);
     }
 
     return {

@@ -1,7 +1,10 @@
 import type { Level } from "./Level";
+import type { UserTopicCompletion } from "./Topic";
 
 export interface QuestionTypeProps {
   levelId: string;
+  topicId: string;
+  onTopicCompleted: (completion: UserTopicCompletion) => void;
 }
 
 export interface Question {

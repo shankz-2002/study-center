@@ -6,8 +6,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+
 import { Category } from "./category.js";
 import { Level } from "./level.js";
+import { UserTopicCompletion } from "./userTopicCompletion.js";
 
 @Entity()
 export class Topic {
@@ -23,11 +25,24 @@ export class Topic {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Category, (category) => category.topics, {
-    onDelete: "CASCADE",
-  })
+  @ManyToOne(
+    () => Category,
+    (category) => category.topics,
+    {
+      onDelete: "CASCADE",
+    }
+  )
   category: Category;
 
-  @OneToMany(() => Level, (level) => level.topic)
+  @OneToMany(
+    () => Level,
+    (level) => level.topic
+  )
   levels: Level[];
+
+  @OneToMany(
+    () => UserTopicCompletion,
+    (completion) => completion.topic
+  )
+  completions: UserTopicCompletion[];
 }

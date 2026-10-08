@@ -2,10 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+
 import "reflect-metadata";
+
 import { RoleType } from "../types/user.js";
+import { UserTopicCompletion } from "./userTopicCompletion.js";
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid")
@@ -20,7 +25,11 @@ export class User {
   @Column({ type: "varchar" })
   password: string;
 
-  @Column({ type: "enum", enum: RoleType, default: RoleType.USER })
+  @Column({
+    type: "enum",
+    enum: RoleType,
+    default: RoleType.USER,
+  })
   role: RoleType;
 
   @Column({ unique: true, type: "varchar" })
@@ -28,4 +37,10 @@ export class User {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(
+    () => UserTopicCompletion,
+    (completion) => completion.user
+  )
+  topicCompletions: UserTopicCompletion[];
 }

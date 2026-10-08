@@ -5,6 +5,8 @@ import { categoryService } from "../service/category.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import { json } from "node:stream/consumers";
 import { topicRepository } from "../utils/repository.js";
+import { UserTopicCompletionService } from "../service/userLevelCompletion.service.js";
+import type { AuthRequest } from "../types/authRequest.js";
 
 export class topicController {
   static createTopic = async (req: Request, res: Response) => {
@@ -69,4 +71,15 @@ export class topicController {
       topics,
     });
   };
+  static checkTopicCompletion=async (req:AuthRequest,res:Response) => {
+    const topicId=String(req.params.id);
+    const userId=String(req?.user?.id)
+    const completion=await UserTopicCompletionService.checkTopicCompletion(userId,topicId);
+    res.status(200).json({
+      success:true,
+      completed:!!completion,
+      completion
+    })
+    
+  }
 }
