@@ -1,3 +1,4 @@
+
 import {
   Column,
   CreateDateColumn,
@@ -5,7 +6,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
+  type Relation,
 } from "typeorm";
+
 import { Level } from "./level.js";
 
 @Entity()
@@ -29,5 +32,5 @@ export class Learning {
   @ManyToOne(() => Level, (level) => level.learning, {
     onDelete: "CASCADE",
   })
-  level: Level;
+  level: Relation<Level>;
 }

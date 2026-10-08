@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, type Relation } from "typeorm";
 import { QuestionType } from "../types/question.js";
 import { Level } from "./level.js";
 
@@ -28,5 +28,5 @@ export class Question {
   @ManyToOne(() => Level, (level) => level.questions, {
     onDelete: "CASCADE",
   })
-  level: Level;
+  level: Relation<Level>;
 }

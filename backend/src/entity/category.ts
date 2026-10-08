@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
 } from "typeorm";
 import { Fields } from "./fields.js";
 import { Topic } from "./topic.js";
@@ -24,8 +25,7 @@ export class Category {
   createdAt: Date;
 
   @ManyToOne(() => Fields, (field) => field.categories)
-  field: Fields;
-
+  field: Relation<Fields>;
   @OneToMany(() => Topic, (topic) => topic.category)
   topics: Topic[];
 }

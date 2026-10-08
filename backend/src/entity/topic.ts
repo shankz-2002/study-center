@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
 } from "typeorm";
 
 import { Category } from "./category.js";
@@ -25,24 +26,13 @@ export class Topic {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(
-    () => Category,
-    (category) => category.topics,
-    {
-      onDelete: "CASCADE",
-    }
-  )
-  category: Category;
-
-  @OneToMany(
-    () => Level,
-    (level) => level.topic
-  )
+  @ManyToOne(() => Category, (category) => category.topics, {
+    onDelete: "CASCADE",
+  })
+  category: Relation<Category>;
+  @OneToMany(() => Level, (level) => level.topic)
   levels: Level[];
 
-  @OneToMany(
-    () => UserTopicCompletion,
-    (completion) => completion.topic
-  )
+  @OneToMany(() => UserTopicCompletion, (completion) => completion.topic)
   completions: UserTopicCompletion[];
 }

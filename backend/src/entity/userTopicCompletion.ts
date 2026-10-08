@@ -5,6 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
+  type Relation,
 } from "typeorm";
 
 import { User } from "./user.js";
@@ -24,8 +25,7 @@ export class UserTopicCompletion {
   @ManyToOne(() => Topic, {
     onDelete: "CASCADE",
   })
-  topic: Topic;
-
+  topic: Relation<Topic>;
   @Column({ type: "int" })
   totalScore: number;
 

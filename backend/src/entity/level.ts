@@ -1,3 +1,4 @@
+
 import {
   Column,
   CreateDateColumn,
@@ -5,7 +6,9 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
 } from "typeorm";
+
 import { Topic } from "./topic.js";
 import { Learning } from "./learning.js";
 import { Question } from "./question.js";
@@ -30,11 +33,11 @@ export class Level {
   @ManyToOne(() => Topic, (topic) => topic.levels, {
     onDelete: "CASCADE",
   })
-  topic: Topic;
+  topic: Relation<Topic>;
 
   @OneToMany(() => Learning, (learning) => learning.level)
-  learning: Learning[];
+  learning: Relation<Learning>[];
 
   @OneToMany(() => Question, (question) => question.level)
-  questions: Question[];
+  questions: Relation<Question>[];
 }
