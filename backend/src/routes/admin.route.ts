@@ -32,7 +32,7 @@ adminRouter.put("/topic/:id", topicController.editTopic);
 
 //level
 adminRouter.get("/levels",levelControler.getLevels)
-adminRouter.post("level/:id", levelControler.createLevel);
+adminRouter.post("/level/:id", levelControler.createLevel);
 adminRouter.delete("/level/:id", levelControler.deleteLevel);
 adminRouter.put("/level/:id", levelControler.editLevel);
 
