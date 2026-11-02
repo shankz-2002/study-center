@@ -14,3 +14,7 @@ export const resetPassword = async (newPassword: string, token: string) => {
     newPassword,
   });
 };
+
+export const sendCredential = async (credential: string) => {
+  return await commonAPI("POST", `${baseUrl}/auth/google`, { credential });
+};

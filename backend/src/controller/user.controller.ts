@@ -74,4 +74,7 @@ export class userController {
       message: "Password changed successfully",
     });
   };
+  static googleAuth=async (req:Request,res:Response) => {
+    
+  }
 }

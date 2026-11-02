@@ -4,12 +4,17 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthProvider.tsx";
 import { CssBaseline } from "@mui/material";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter>
-    <AuthProvider>
-      <CssBaseline />
-      <App />
-    </AuthProvider>
-  </BrowserRouter>,
+  <GoogleOAuthProvider
+  clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+  >
+    <BrowserRouter>
+      <AuthProvider>
+        <CssBaseline />
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
+  </GoogleOAuthProvider>,
 );

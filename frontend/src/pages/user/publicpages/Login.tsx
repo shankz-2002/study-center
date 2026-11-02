@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { loginApi } from "../../../services/auth";
+import { loginApi, sendCredential } from "../../../services/auth";
 import { useAuth } from "../../../context/useAuth";
 import { useNavigate } from "react-router-dom";
 import {
@@ -22,6 +22,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { GoogleLogin } from "@react-oauth/google";
 
 function Login() {
   const [form, setForm] = useState({
@@ -39,6 +40,18 @@ function Login() {
       ...form,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleGoogleAuth = async (credential: string) => {
+    try {
+      const response = await sendCredential(credential);
+      const data = response.data;
+
+      console.log(data.token);
+      console.log(data.user);
+    } catch (error) {
+      console.error("Google authentication error:", error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -380,6 +393,16 @@ function Login() {
           </Box>
         </Box>
       </Container>
+      <GoogleLogin
+        onSuccess={(response) => {
+          if (response.credential) {
+            handleGoogleAuth(response.credential);
+          }
+        }}
+        onError={() => {
+          console.log("Google login failed");
+        }}
+      />
     </Box>
   );
 }
