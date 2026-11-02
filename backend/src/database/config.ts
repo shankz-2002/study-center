@@ -9,6 +9,7 @@
     import { Question } from '../entity/question.js';
     import { UserLevelProgress } from '../entity/levelProgress.js';
     import { UserTopicCompletion } from '../entity/userTopicCompletion.js';
+import { PasswordResetToken } from '../entity/passwordReset.js';
 
     export const AppDataSource = new DataSource({
         type: "postgres",
@@ -19,6 +20,6 @@
         database: process.env.DB_NAME,
         synchronize: true,
         logging: false,
-        entities: [Fields,Category,User,Topic,Level,Learning,Question,UserLevelProgress,UserTopicCompletion]
+        entities: [Fields,Category,User,Topic,Level,Learning,Question,UserLevelProgress,UserTopicCompletion,PasswordResetToken]
 
     })

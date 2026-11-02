@@ -1,9 +1,10 @@
 import { ApiError } from "../utils/ApiError.js";
-import { userRepository } from "../utils/repository.js";
+import { resetTokenRepository, userRepository } from "../utils/repository.js";
 import bcrpyt from "bcrypt";
 import { tokenUtil } from "../utils/token.js";
 import type { RoleType } from "../types/user.js";
-
+import crypto from "crypto";
+import { sendEmail } from "../email/email.service.js";
 export class userService {
   static registerUser = async (
     firstName: string,
@@ -68,5 +69,64 @@ export class userService {
     }
     await userRepository.remove(user);
     return user;
+  };
+  static forgotPassword = async (email: string) => {
+    const user = await userRepository.findOne({ where: { email } });
+    if (!user) {
+      return;
+    }
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    await resetTokenRepository.delete({
+      userId: user.id,
+    });
+    await resetTokenRepository.save({
+      userId: user.id,
+      token: hashedToken,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+    });
+    await sendEmail(
+      user.email,
+      "Reset Your Password",
+      `
+        <h2>Password Reset</h2>
+        <p>Click the link below to reset your password.</p>
+
+        <a href="${resetUrl}">
+            Reset Password
+        </a>
+
+        <p>This link expires in 15 minutes.</p>
+    `,
+    );
+  };
+  static resetPassword = async (newPassword: string, resetToken: string) => {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+      console.log("This is the hashedToken",hashedToken);
+    const token = await resetTokenRepository.findOne({
+      where: { token: hashedToken },
+    });
+    if (!token) {
+      throw new ApiError(409, "invalid reset token");
+    }
+    if (token.expiresAt.getTime() <= Date.now()) {
+      await resetTokenRepository.remove(token);
+      throw new Error("Reset token has expired");
+    }
+    const user = await userRepository.findOne({ where: { id: token.userId } });
+    if (!user) {
+      throw new ApiError(404, "user not found");
+    }
+    const hashedPassword = await bcrpyt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await userRepository.save(user);
+    await resetTokenRepository.remove(token);
   };
 }

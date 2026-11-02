@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { userService } from "../service/user.service.js";
 import type { AuthRequest } from "../types/authRequest.js";
-import type { RoleType } from "../types/user.js";
 export class userController {
   static registerUser = async (req: Request, res: Response) => {
     const { firstName, lastName, password, email } = req.body;
@@ -56,6 +55,23 @@ export class userController {
     res.status(200).json({
       success: true,
       user,
+    });
+  };
+  static forgotPassword = async (req: Request, res: Response) => {
+    const { email } = req.body;
+    await userService.forgotPassword(email);
+    res.status(200).json({
+      success: true,
+      message: "link send ot mail",
+    });
+  };
+  static resetPassword = async (req: Request, res: Response) => {
+    const { newPassword } = req.body;
+    const resetToken = String(req.params.id);
+    await userService.resetPassword(newPassword, resetToken);
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
     });
   };
 }
