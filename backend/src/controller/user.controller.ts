@@ -62,7 +62,7 @@ export class userController {
     await userService.forgotPassword(email);
     res.status(200).json({
       success: true,
-      message: "link send ot mail",
+      message: "link send to mail",
     });
   };
   static resetPassword = async (req: Request, res: Response) => {

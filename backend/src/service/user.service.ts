@@ -109,7 +109,6 @@ export class userService {
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
-      console.log("This is the hashedToken",hashedToken);
     const token = await resetTokenRepository.findOne({
       where: { token: hashedToken },
     });

@@ -19,6 +19,7 @@ import AdminQuestions from "./pages/admin/AdminQuestions";
 import AdminUsers from "./pages/admin/AdminUsers";
 import ForgottenPassword from "./pages/user/publicpages/ForgottenPassword";
 import Profile from "./pages/user/privatepages/Profile";
+import ResetPassword from "./pages/user/publicpages/ResetPassword";
 
 function App() {
   return (
@@ -32,12 +33,13 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgottenPassword/>}/>
+        <Route path="/forgot-password" element={<ForgottenPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         <Route
           element={<ProtectedRouteLayout allowedRoles={["ADMIN", "USER"]} />}
         >
-          <Route path="/profile" element={<Profile/>}/>
+          <Route path="/profile" element={<Profile />} />
           <Route path="/fields/:id" element={<Field />} />
           <Route path="/categories/:id" element={<Category />} />
           <Route path="/topics/:id" element={<Topic />} />
