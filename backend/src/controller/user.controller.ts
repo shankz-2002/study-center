@@ -1,6 +1,10 @@
 import type { Request, Response } from "express";
 import { userService } from "../service/user.service.js";
 import type { AuthRequest } from "../types/authRequest.js";
+import { ApiError } from "../utils/ApiError.js";
+import { OAuth2Client } from "google-auth-library";
+import { userRepository } from "../utils/repository.js";
+import { tokenUtil } from "../utils/token.js";
 export class userController {
   static registerUser = async (req: Request, res: Response) => {
     const { firstName, lastName, password, email } = req.body;
@@ -74,7 +78,16 @@ export class userController {
       message: "Password changed successfully",
     });
   };
-  static googleAuth=async (req:Request,res:Response) => {
-    
-  }
+  static googleAuth = async (req: Request, res: Response) => {
+    const { credential } = req.body;
+    const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+    const result = await userService.googleAuth(credential,googleClient);
+    res.status(200).json({
+      success:true,
+      result
+    })
+
+ 
+  };
 }

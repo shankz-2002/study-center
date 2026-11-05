@@ -16,14 +16,21 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ type: "varchar" })
-  firstName: string;
+  @Column({ type: "varchar", nullable: true })
+  firstName: string | null;
 
-  @Column({ type: "varchar" })
-  lastName: string;
+  @Column({ type: "varchar", nullable: true })
+  lastName: string | null;
 
-  @Column({ type: "varchar" })
-  password: string;
+  @Column({ type: "varchar", nullable: true })
+  password: string | null;
+
+  @Column({
+    type: "varchar",
+    nullable: true,
+    unique: true,
+  })
+  googleId: string | null;
 
   @Column({
     type: "enum",
@@ -38,9 +45,6 @@ export class User {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(
-    () => UserTopicCompletion,
-    (completion) => completion.user
-  )
+  @OneToMany(() => UserTopicCompletion, (completion) => completion.user)
   topicCompletions: UserTopicCompletion[];
 }

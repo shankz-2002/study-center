@@ -30,6 +30,7 @@ function Login() {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -44,13 +45,26 @@ function Login() {
 
   const handleGoogleAuth = async (credential: string) => {
     try {
+      setGoogleLoading(true);
       const response = await sendCredential(credential);
-      const data = response.data;
 
-      console.log(data.token);
-      console.log(data.user);
+      const { user, accessToken } = response.data.result;
+
+      login(user, accessToken);
+
+      toast.success("Login Successful");
+
+      if (user.role === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/home");
+      }
     } catch (error) {
+      const err = error as ApiError;
+      toast.error(err?.data?.message || "Login Failed");
       console.error("Google authentication error:", error);
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -63,9 +77,9 @@ function Login() {
       if (response.data.success) {
         toast.success("Login successful");
         login(response.data.result.user, response.data.result.accessToken);
-        if (response?.data.result.user.role == "ADMIN") {
+        if (response?.data.result.user.role === "ADMIN") {
           navigate("/admin/dashboard");
-        } else if (response?.data.result.user.role == "USER") {
+        } else {
           navigate("/home");
         }
       }
@@ -81,21 +95,14 @@ function Login() {
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
 
-  // Shared input styling — soft, rounded, indigo focus
   const inputSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "14px",
       backgroundColor: "rgba(255, 255, 255, 0.75)",
       transition: "box-shadow 0.2s ease, background-color 0.2s ease",
-      "& fieldset": {
-        borderColor: "rgba(15, 23, 42, 0.10)",
-      },
-      "&:hover fieldset": {
-        borderColor: "rgba(99, 102, 241, 0.35)",
-      },
-      "&.Mui-focused": {
-        boxShadow: "0 0 0 4px rgba(99, 102, 241, 0.14)",
-      },
+      "& fieldset": { borderColor: "rgba(15, 23, 42, 0.10)" },
+      "&:hover fieldset": { borderColor: "rgba(99, 102, 241, 0.35)" },
+      "&.Mui-focused": { boxShadow: "0 0 0 4px rgba(99, 102, 241, 0.14)" },
       "&.Mui-focused fieldset": {
         borderColor: "#6366f1",
         borderWidth: "1.5px",
@@ -104,15 +111,9 @@ function Login() {
     "& .MuiInputLabel-root": {
       color: "#64748b",
       fontWeight: 500,
-      "&.Mui-focused": {
-        color: "#4f46e5",
-        fontWeight: 600,
-      },
+      "&.Mui-focused": { color: "#4f46e5", fontWeight: 600 },
     },
-    "& .MuiInputBase-input": {
-      fontWeight: 500,
-      color: "#0f172a",
-    },
+    "& .MuiInputBase-input": { fontWeight: 500, color: "#0f172a" },
   };
 
   return (
@@ -123,7 +124,6 @@ function Login() {
         alignItems: "center",
         justifyContent: "center",
         py: { xs: 6, md: 8 },
-        // Matches Home's ambient gradient backdrop
         background:
           "radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%), " +
           "radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%), " +
@@ -146,7 +146,6 @@ function Login() {
               "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
             overflow: "hidden",
             p: { xs: 3.5, sm: 4.5 },
-            // Top gradient accent line
             "&::before": {
               content: '""',
               position: "absolute",
@@ -193,11 +192,7 @@ function Login() {
 
             <Typography
               variant="body2"
-              sx={{
-                color: "#64748b",
-                fontWeight: 500,
-                fontSize: "0.92rem",
-              }}
+              sx={{ color: "#64748b", fontWeight: 500, fontSize: "0.92rem" }}
             >
               Login to continue your learning journey
             </Typography>
@@ -207,11 +202,7 @@ function Login() {
           <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2.25,
-            }}
+            sx={{ display: "flex", flexDirection: "column", gap: 2.25 }}
           >
             <TextField
               label="Email"
@@ -333,12 +324,8 @@ function Login() {
                     "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
                   color: "#fff",
                 },
-                "& .MuiButton-endIcon": {
-                  transition: "transform 0.25s ease",
-                },
-                "&:hover .MuiButton-endIcon": {
-                  transform: "translateX(3px)",
-                },
+                "& .MuiButton-endIcon": { transition: "transform 0.25s ease" },
+                "&:hover .MuiButton-endIcon": { transform: "translateX(3px)" },
               }}
             >
               {loading ? (
@@ -363,6 +350,47 @@ function Login() {
               OR
             </Divider>
 
+            {/* Google Login — INSIDE the card, below the OR divider */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                position: "relative",
+                opacity: googleLoading ? 0.6 : 1,
+                pointerEvents: googleLoading ? "none" : "auto",
+                transition: "opacity 0.2s ease",
+              }}
+            >
+              <GoogleLogin
+                onSuccess={(response) => {
+                  if (response.credential) {
+                    handleGoogleAuth(response.credential);
+                  }
+                }}
+                onError={() => {
+                  toast.error("Google login failed");
+                }}
+                theme="outline"
+                size="large"
+                width="340"
+                shape="pill"
+                text="continue_with"
+              />
+              {googleLoading && (
+                <CircularProgress
+                  size={22}
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    mt: "-11px",
+                    ml: "-11px",
+                    color: "#6366f1",
+                  }}
+                />
+              )}
+            </Box>
+
             {/* Signup prompt */}
             <Typography
               variant="body2"
@@ -370,6 +398,7 @@ function Login() {
                 textAlign: "center",
                 color: "#64748b",
                 fontSize: "0.9rem",
+                mt: 0.5,
               }}
             >
               Don&apos;t have an account?{" "}
@@ -393,16 +422,6 @@ function Login() {
           </Box>
         </Box>
       </Container>
-      <GoogleLogin
-        onSuccess={(response) => {
-          if (response.credential) {
-            handleGoogleAuth(response.credential);
-          }
-        }}
-        onError={() => {
-          console.log("Google login failed");
-        }}
-      />
     </Box>
   );
 }
