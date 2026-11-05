@@ -60,6 +60,7 @@ function Login() {
         navigate("/home");
       }
     } catch (error) {
+      console.log("testing");
       const err = error as ApiError;
       toast.error(err?.data?.message || "Login Failed");
       console.error("Google authentication error:", error);
