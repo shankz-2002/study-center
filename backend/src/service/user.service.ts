@@ -181,8 +181,16 @@ export class userService {
     );
     const { password: _, ...user } = savedUser;
     return {
-    user,
-    accessToken,
+      user,
+      accessToken,
+    };
   };
-  };
+  static updateUser=async (firstName:string,lastName:string,userId:string) => {
+    const user=await this.getUser(userId);
+    user.firstName=firstName;
+    user.lastName=lastName;
+    return await userRepository.save(user);
+    
+  }
+ 
 }

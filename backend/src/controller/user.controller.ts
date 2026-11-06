@@ -82,12 +82,29 @@ export class userController {
     const { credential } = req.body;
     const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-    const result = await userService.googleAuth(credential,googleClient);
+    const result = await userService.googleAuth(credential, googleClient);
     res.status(200).json({
-      success:true,
-      result
-    })
-
- 
+      success: true,
+      result,
+    });
+  };
+  static getCurrentUser = async (req: AuthRequest, res: Response) => {
+    const userId = String(req.user?.id);
+    const newUser = await userService.getUser(userId);
+    const { password, googleId, role, ...user } = newUser;
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  };
+  static updateUser = async (req: AuthRequest, res: Response) => {
+    const { firstName, lastName } = req.body;
+    const userId = String(req.user?.id);
+    const newUser = await userService.updateUser(firstName, lastName, userId);
+    const { password, googleId, ...user } = newUser;
+    res.status(200).json({
+      success: true,
+      user,
+    });
   };
 }

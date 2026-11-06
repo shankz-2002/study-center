@@ -11,3 +11,5 @@ export const editUser = async (id: string, role: RoleType) => {
 export const deleteUser = async (id: string) => {
   return await commonAPI("DELETE", `${baseUrl}/admin/user/${id}`);
 };
+
+

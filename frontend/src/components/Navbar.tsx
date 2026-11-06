@@ -68,7 +68,7 @@ function Navbar() {
     setAnchorEl(e.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
-  /* ---------------- Admin nav items (used in both desktop + drawer) ---------------- */
+  /* ---------------- Admin nav items ---------------- */
   const adminItems = [
     {
       label: "Admin Dashboard",
@@ -218,49 +218,19 @@ function Navbar() {
                     }}
                   />
 
-                  <Tooltip title="Logout" arrow>
-                    <IconButton
-                      onClick={logout}
-                      sx={{
-                        color: "#64748b",
-                        borderRadius: "12px",
-                        p: 1.1,
-                        transition: "all 0.2s ease",
-                        "&:hover": {
-                          backgroundColor: "rgba(244, 63, 94, 0.08)",
-                          color: "#e11d48",
-                        },
-                      }}
-                    >
-                      <LogoutIcon sx={{ fontSize: 20 }} />
-                    </IconButton>
-                  </Tooltip>
-                </>
-              ) : (
-                // ---- Normal user (desktop) ----
-                <>
-                  <Button
-                    href="/profile"
-                    startIcon={<PersonIcon sx={{ fontSize: 18 }} />}
-                    sx={navButtonSx}
-                  >
-                    Profile
-                  </Button>
-
-                  <Divider
-                    orientation="vertical"
-                    flexItem
-                    sx={{
-                      mx: 1,
-                      my: 2,
-                      borderColor: "rgba(15, 23, 42, 0.08)",
-                    }}
-                  />
-
+                  {/* Admin — click avatar to open dropdown */}
                   <Tooltip title={user.firstName || "User"} arrow>
                     <Box
+                      onClick={handleMenuOpen}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleMenuOpen(e as unknown as React.MouseEvent<HTMLElement>);
+                        }
+                      }}
                       sx={{
-                        position: "relative",
                         display: "inline-flex",
                         p: "2px",
                         borderRadius: "50%",
@@ -285,26 +255,50 @@ function Navbar() {
                       </Avatar>
                     </Box>
                   </Tooltip>
-
-                  <Tooltip title="Logout" arrow>
-                    <IconButton
-                      onClick={logout}
+                </>
+              ) : (
+                // ---- Normal user (desktop) — just the avatar ----
+                <Tooltip title={user.firstName || "User"} arrow>
+                  <Box
+                    onClick={handleMenuOpen}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleMenuOpen(
+                          e as unknown as React.MouseEvent<HTMLElement>
+                        );
+                      }
+                    }}
+                    sx={{
+                      display: "inline-flex",
+                      p: "2px",
+                      borderRadius: "50%",
+                      background: brandGradient,
+                      cursor: "pointer",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        boxShadow: "0 6px 18px -6px rgba(139, 92, 246, 0.6)",
+                      },
+                    }}
+                  >
+                    <Avatar
                       sx={{
-                        ml: 0.5,
-                        color: "#64748b",
-                        borderRadius: "12px",
-                        p: 1.1,
-                        transition: "all 0.2s ease",
-                        "&:hover": {
-                          backgroundColor: "rgba(244, 63, 94, 0.08)",
-                          color: "#e11d48",
-                        },
+                        width: 34,
+                        height: 34,
+                        bgcolor: "#fff",
+                        color: "#4f46e5",
+                        fontSize: "0.9rem",
+                        fontWeight: 700,
+                        border: "2px solid #fff",
                       }}
                     >
-                      <LogoutIcon sx={{ fontSize: 20 }} />
-                    </IconButton>
-                  </Tooltip>
-                </>
+                      {userInitial}
+                    </Avatar>
+                  </Box>
+                </Tooltip>
               )
             ) : (
               <Button
@@ -346,26 +340,24 @@ function Navbar() {
           >
             {user && (
               <>
-                {user.role !== "ADMIN" && (
-                  <Avatar
-                    onClick={handleMenuOpen}
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      bgcolor: "#fff",
-                      color: "#4f46e5",
-                      fontSize: "0.85rem",
-                      fontWeight: 700,
-                      border: "2px solid transparent",
-                      backgroundImage: brandGradient,
-                      backgroundOrigin: "border-box",
-                      backgroundClip: "padding-box, border-box",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {userInitial}
-                  </Avatar>
-                )}
+                <Avatar
+                  onClick={handleMenuOpen}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: "#fff",
+                    color: "#4f46e5",
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    border: "2px solid transparent",
+                    backgroundImage: brandGradient,
+                    backgroundOrigin: "border-box",
+                    backgroundClip: "padding-box, border-box",
+                    cursor: "pointer",
+                  }}
+                >
+                  {userInitial}
+                </Avatar>
 
                 <IconButton
                   onClick={handleDrawerToggle}
@@ -487,7 +479,7 @@ function Navbar() {
           </IconButton>
         </Box>
 
-        {/* Drawer items */}
+        {/* Drawer items — no separate Profile/Logout, since these live in the avatar menu */}
         <List sx={{ px: 1.5, py: 2 }}>
           <ListItemButton
             component="a"
@@ -506,80 +498,28 @@ function Navbar() {
             />
           </ListItemButton>
 
-          {user?.role === "ADMIN" ? (
-            <>
-              {adminItems.map((item) => (
-                <ListItemButton
-                  key={item.href}
-                  component="a"
-                  href={item.href}
-                  onClick={handleDrawerToggle}
-                  sx={drawerItemSx}
-                >
-                  <ListItemIcon sx={{ minWidth: 36 }}>
-                    <Box sx={{ color: "#6366f1", display: "flex" }}>
-                      {item.icon}
-                    </Box>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.label}
-                    slotProps={{
-                      primary: { sx: { fontWeight: 600, fontSize: "0.95rem" } },
-                    }}
-                  />
-                </ListItemButton>
-              ))}
-            </>
-          ) : (
-            user && (
+          {user?.role === "ADMIN" &&
+            adminItems.map((item) => (
               <ListItemButton
+                key={item.href}
                 component="a"
-                href="/profile"
+                href={item.href}
                 onClick={handleDrawerToggle}
                 sx={drawerItemSx}
               >
                 <ListItemIcon sx={{ minWidth: 36 }}>
-                  <PersonIcon sx={{ fontSize: 20, color: "#6366f1" }} />
+                  <Box sx={{ color: "#6366f1", display: "flex" }}>
+                    {item.icon}
+                  </Box>
                 </ListItemIcon>
                 <ListItemText
-                  primary="Profile"
+                  primary={item.label}
                   slotProps={{
                     primary: { sx: { fontWeight: 600, fontSize: "0.95rem" } },
                   }}
                 />
               </ListItemButton>
-            )
-          )}
-
-          {user && (
-            <>
-              <Divider sx={{ my: 2, borderColor: "rgba(15, 23, 42, 0.08)" }} />
-              <ListItemButton
-                onClick={() => {
-                  handleDrawerToggle();
-                  logout();
-                }}
-                sx={{
-                  ...drawerItemSx,
-                  color: "#e11d48",
-                  "&:hover": {
-                    backgroundColor: "rgba(244, 63, 94, 0.08)",
-                    color: "#e11d48",
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 36 }}>
-                  <LogoutIcon sx={{ fontSize: 20, color: "#e11d48" }} />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Logout"
-                  slotProps={{
-                    primary: { sx: { fontWeight: 600, fontSize: "0.95rem" } },
-                  }}
-                />
-              </ListItemButton>
-            </>
-          )}
+            ))}
 
           {!user && (
             <Box sx={{ px: 1.5, mt: 2 }}>
@@ -607,7 +547,7 @@ function Navbar() {
         </List>
       </Drawer>
 
-      {/* ---------------- Mobile avatar dropdown menu ---------------- */}
+      {/* ---------------- Avatar dropdown menu (desktop + mobile) ---------------- */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -618,7 +558,7 @@ function Navbar() {
           paper: {
             sx: {
               mt: 1,
-              minWidth: 180,
+              minWidth: 200,
               borderRadius: "14px",
               border: "1px solid rgba(15, 23, 42, 0.06)",
               boxShadow:
@@ -627,21 +567,55 @@ function Navbar() {
           },
         }}
       >
-        <MenuItem
-          component="a"
-          href="/profile"
-          onClick={handleMenuClose}
-          sx={{
-            fontSize: "0.9rem",
-            fontWeight: 600,
-            color: "#334155",
-            py: 1.2,
-            "&:hover": { backgroundColor: "rgba(99, 102, 241, 0.06)" },
-          }}
-        >
-          <PersonIcon sx={{ fontSize: 18, mr: 1.25, color: "#6366f1" }} />
-          Profile
-        </MenuItem>
+        {/* Header — name + email */}
+        {user && (
+          <Box sx={{ px: 2, py: 1.5 }}>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: "0.9rem",
+                color: "#0f172a",
+                letterSpacing: "-0.2px",
+                lineHeight: 1.3,
+              }}
+            >
+              {[user.firstName, user.lastName].filter(Boolean).join(" ") ||
+                "User"}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "0.78rem",
+                color: "#94a3b8",
+                fontWeight: 500,
+                mt: 0.25,
+                wordBreak: "break-word",
+              }}
+            >
+              {user.email}
+            </Typography>
+          </Box>
+        )}
+
+        <Divider sx={{ borderColor: "rgba(15, 23, 42, 0.06)" }} />
+
+        {/* Profile (hidden for admins since they don't have that page) */}
+        {user?.role !== "ADMIN" && (
+          <MenuItem
+            component="a"
+            href="/profile"
+            onClick={handleMenuClose}
+            sx={{
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: "#334155",
+              py: 1.2,
+              "&:hover": { backgroundColor: "rgba(99, 102, 241, 0.06)" },
+            }}
+          >
+            <PersonIcon sx={{ fontSize: 18, mr: 1.25, color: "#6366f1" }} />
+            Profile
+          </MenuItem>
+        )}
 
         <MenuItem
           onClick={() => {

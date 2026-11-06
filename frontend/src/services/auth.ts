@@ -1,3 +1,4 @@
+import type { ProfileFormData } from "../types/User";
 import commonAPI, { baseUrl } from "./commonApi";
 export const loginApi = async (form: object) => {
   return await commonAPI("POST", `${baseUrl}/auth/login`, form);
@@ -17,4 +18,11 @@ export const resetPassword = async (newPassword: string, token: string) => {
 
 export const sendCredential = async (credential: string) => {
   return await commonAPI("POST", `${baseUrl}/auth/google`, { credential });
+};
+
+export const getUserDetails = async () => {
+  return await commonAPI("GET", `${baseUrl}/auth`);
+};
+export const updateUserDetails = async (data: ProfileFormData) => {
+  return await commonAPI("PUT", `${baseUrl}/auth`, data);
 };
