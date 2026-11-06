@@ -24,7 +24,12 @@ import type { LevelProgress } from "../../types/Progress";
 import { getProgress } from "../../services/progress";
 import { checkTopicCompletion } from "../../services/topic";
 
-function Questions({ levelId, topicId, onTopicCompleted }: QuestionTypeProps) {
+function Questions({
+  levelId,
+  topicId,
+  onTopicCompleted,
+  onLevelCompleted,
+}: QuestionTypeProps) {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -92,9 +97,12 @@ function Questions({ levelId, topicId, onTopicCompleted }: QuestionTypeProps) {
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
+
       const response = await checkAnswer(levelId, answers);
+
       if (response?.data?.success) {
         setResult(response?.data?.result);
+
         if (response.data.result.passed) {
           setProgress({
             score: response.data.result.score,
@@ -102,13 +110,18 @@ function Questions({ levelId, topicId, onTopicCompleted }: QuestionTypeProps) {
             completedAt: new Date().toISOString(),
           });
 
+          // Refresh levels to update completion and unlock status
+          await onLevelCompleted();
+
           const completionResponse = await checkTopicCompletion(topicId);
-          console.log("thisnis the topic completion check", completionResponse);
+
+          console.log("this is the topic completion check", completionResponse);
 
           if (completionResponse.data.completed) {
             onTopicCompleted(completionResponse.data.completion);
           }
         }
+
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } catch (error) {

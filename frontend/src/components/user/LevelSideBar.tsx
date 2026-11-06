@@ -1,3 +1,4 @@
+
 import {
   Box,
   List,
@@ -9,6 +10,7 @@ import {
 
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import type { LevelSideBarProps } from "../../types/Level";
 
 function LevelSideBar({
@@ -21,7 +23,6 @@ function LevelSideBar({
 
   return (
     <Box sx={{ width: "100%", p: { xs: 2, md: 2.5 } }}>
-      {/* ---------------- Header ---------------- */}
       <Box
         sx={{
           display: "flex",
@@ -80,18 +81,20 @@ function LevelSideBar({
         </Box>
       </Box>
 
-      {/* ---------------- Levels list ---------------- */}
       <List
         disablePadding
         sx={{ display: "flex", flexDirection: "column", gap: 1 }}
       >
         {levels.map((level) => {
           const isActive = selectedLevel?.id === level.id;
+          const isLocked = !level.isUnlocked;
+          const isCompleted = level.isCompleted;
 
           return (
             <ListItemButton
               key={level.id}
               selected={isActive}
+              disabled={isLocked}
               onClick={() => onSelectLevel(level)}
               sx={{
                 position: "relative",
@@ -106,6 +109,7 @@ function LevelSideBar({
                 borderColor: isActive
                   ? "rgba(99, 102, 241, 0.25)"
                   : "transparent",
+
                 "&::before": {
                   content: '""',
                   position: "absolute",
@@ -118,6 +122,7 @@ function LevelSideBar({
                   opacity: isActive ? 1 : 0,
                   transition: "opacity 0.22s ease",
                 },
+
                 "&:hover": {
                   backgroundColor: isActive
                     ? "rgba(99, 102, 241, 0.12)"
@@ -129,16 +134,21 @@ function LevelSideBar({
                   "& .level-number": {
                     background: brandGradient,
                     color: "#fff",
-                    boxShadow:
-                      "0 6px 14px -6px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.35)",
                   },
                 },
+
                 "&.Mui-selected": {
                   backgroundColor: "rgba(99, 102, 241, 0.08)",
                   "&:hover": {
                     backgroundColor: "rgba(99, 102, 241, 0.12)",
                   },
                 },
+
+                "&.Mui-disabled": {
+                  opacity: 0.55,
+                  cursor: "not-allowed",
+                },
+
                 "&.Mui-focusVisible": {
                   outline: "none",
                   boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.18)",
@@ -203,7 +213,25 @@ function LevelSideBar({
                 }}
               />
 
-              {isActive && (
+              {isCompleted ? (
+                <CheckCircleRoundedIcon
+                  sx={{
+                    fontSize: 19,
+                    color: "success.main",
+                    ml: 1,
+                    flexShrink: 0,
+                  }}
+                />
+              ) : isLocked ? (
+                <LockOutlinedIcon
+                  sx={{
+                    fontSize: 18,
+                    color: "text.disabled",
+                    ml: 1,
+                    flexShrink: 0,
+                  }}
+                />
+              ) : isActive ? (
                 <CheckCircleRoundedIcon
                   sx={{
                     fontSize: 18,
@@ -212,7 +240,7 @@ function LevelSideBar({
                     flexShrink: 0,
                   }}
                 />
-              )}
+              ) : null}
             </ListItemButton>
           );
         })}

@@ -76,6 +76,19 @@ function Topic() {
     }
   }, [id]);
 
+  const refreshLevels = async () => {
+    try {
+      const response = await getLevels(id!);
+
+      if (response.data.success) {
+        setLevels(response.data.levels);
+      }
+    } catch (error) {
+      const err = error as ApiError;
+      toast.error(err.data?.message || "Failed to refresh levels");
+    }
+  };
+
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
   const brandGradientSoft =
@@ -398,6 +411,7 @@ function Topic() {
                 levelId={selectedLevel.id}
                 topicId={id!}
                 onTopicCompleted={setTopicCompletion}
+                onLevelCompleted={refreshLevels}
               />
               {topicCompletion && (
                 <TopicCompletion completion={topicCompletion} />

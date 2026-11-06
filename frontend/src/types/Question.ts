@@ -5,6 +5,7 @@ export interface QuestionTypeProps {
   levelId: string;
   topicId: string;
   onTopicCompleted: (completion: UserTopicCompletion) => void;
+  onLevelCompleted: () => Promise<void>;
 }
 
 export interface Question {

@@ -6,8 +6,9 @@ export interface Level {
   description: string;
   order: number;
   topic?: Topic;
+  isCompleted: boolean;
+  isUnlocked: boolean;
 }
-
 export interface LevelSideBarProps {
   levels: Level[];
   selectedLevel: Level | null;

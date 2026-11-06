@@ -1,7 +1,9 @@
+import { LessThan } from "typeorm";
 import { ApiError } from "../utils/ApiError.js";
 import {
   learningRepository,
   levelRepository,
+  progressRepository,
   topicRepository,
 } from "../utils/repository.js";
 
@@ -24,19 +26,96 @@ export class levelService {
     });
     return await levelRepository.save(level);
   };
-  static getAllLevels = async (id: string) => {
-    const topic = await topicRepository.find({ where: { id } });
-    if (!topic) {
-      throw new ApiError(404, "Topic Not Found");
+  static getAllLevels = async (topicId: string, userId: string) => {
+    const levels = await levelRepository.find({
+      where: {
+        topic: { id: topicId },
+      },
+      order: {
+        order: "ASC",
+      },
+    });
+
+    if (levels.length === 0) {
+      throw new ApiError(404, "No levels found");
     }
-    const levels = await levelRepository.find({ where: { topic: { id } } });
-    return levels;
+
+    // Fetch this user's completed levels for this topic
+    const progress = await progressRepository.find({
+      where: {
+        user: { id: userId },
+        level: {
+          topic: { id: topicId },
+        },
+      },
+      relations: {
+        level: true,
+      },
+    });
+
+    const completedLevelIds = new Set(progress.map((item) => item.level.id));
+
+    // Calculate completion and unlock status
+    const levelsWithStatus = levels.map((level, index) => {
+      const isCompleted = completedLevelIds.has(level.id);
+
+      const isUnlocked =
+        index === 0 || completedLevelIds.has(levels[index - 1].id);
+
+      return {
+        ...level,
+        isCompleted,
+        isUnlocked,
+      };
+    });
+
+    return levelsWithStatus;
   };
   static getLevel = async (id: string) => {
     const level = await levelRepository.findOne({ where: { id } });
     if (!level) {
       throw new ApiError(404, "Level not found");
     }
+    return level;
+  };
+
+  static getLevelVersion2 = async (levelId: string, userId: string) => {
+    const level = await levelRepository.findOne({
+      where: { id: levelId },
+      relations: {
+        topic: true,
+      },
+    });
+
+    if (!level) {
+      throw new ApiError(404, "Level not found");
+    }
+
+    // Find the immediately preceding level
+    const previousLevel = await levelRepository.findOne({
+      where: {
+        topic: { id: level.topic.id },
+        order: LessThan(level.order),
+      },
+      order: {
+        order: "DESC",
+      },
+    });
+
+    // First level has no previous level
+    if (previousLevel) {
+      const isPreviousCompleted = await progressRepository.findOne({
+        where: {
+          user: { id: userId },
+          level: { id: previousLevel.id },
+        },
+      });
+
+      if (!isPreviousCompleted) {
+        throw new ApiError(403, "Complete the previous level first");
+      }
+    }
+
     return level;
   };
 

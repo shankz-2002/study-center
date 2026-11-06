@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { levelService } from "../service/level.service.js";
+import type { AuthRequest } from "../types/authRequest.js";
 
 export class levelControler {
   static createLevel = async (req: Request, res: Response) => {
@@ -16,17 +17,20 @@ export class levelControler {
       level,
     });
   };
-  static getAllLevels = async (req: Request, res: Response) => {
+  static getAllLevels = async (req: AuthRequest, res: Response) => {
     const id = String(req.params.id);
-    const levels = await levelService.getAllLevels(id);
+    const userId = String(req.user?.id);
+
+    const levels = await levelService.getAllLevels(id,userId);
     res.status(200).json({
       success: true,
       levels,
     });
   };
-  static getLevel = async (req: Request, res: Response) => {
+  static getLevel = async (req: AuthRequest, res: Response) => {
     const id = String(req.params.id);
-    const level = await levelService.getLevel(id);
+    const userId = String(req?.user?.id);
+    const level = await levelService.getLevelVersion2(id, userId);
     res.status(200).json({
       success: true,
       level,
@@ -54,7 +58,7 @@ export class levelControler {
       level,
     });
   };
-  static getLevels = async (req:Request, res: Response) => {
+  static getLevels = async (req: Request, res: Response) => {
     const levels = await levelService.getLevels();
     res.status(200).json({
       success: true,
