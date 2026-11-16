@@ -21,3 +21,12 @@ export interface UserTopicCompletion {
   completedLevels: number;
   completedAt: string;
 }
+
+export type RecentlyCompletedTopic = {
+  topicId: string;
+  topicName: string;
+  categoryName: string;
+  fieldName: string;
+  percentage: number;
+  completedAt: string;
+};

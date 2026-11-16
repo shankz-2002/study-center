@@ -79,6 +79,35 @@ export class topicService {
         user: { id: userId },
       },
     });
-    return topicsCompleted
+    return topicsCompleted;
+  };
+  static recentlyCompletedTopic = async (userId: string) => {
+    await userService.getUser(userId);
+
+    const completedTopics = await userTopicCompletionRepository.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: {
+        topic: {
+          category: {
+            field: true,
+          },
+        },
+      },
+      order: {
+        completedAt: "DESC",
+      },
+      take: 3,
+    });
+
+    return completedTopics.map((completion) => ({
+      topicId: completion.topic.id,
+      topicName: completion.topic.topicName,
+      categoryName: completion.topic.category.categoryName,
+      fieldName: completion.topic.category.field.fieldName,
+      percentage: completion.percentage,
+      completedAt: completion.completedAt,
+    }));
   };
 }

@@ -4,8 +4,10 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 const topicRouter = express.Router();
 topicRouter.use(authMiddleware.authenticate);
 
+topicRouter.get("/recently", topicController.recentlyCompletedTopic);
+
 topicRouter.get("/:id", topicController.getTopic);
 topicRouter.get("/:id/completion", topicController.checkTopicCompletion);
-topicRouter.get("",topicController.countTopicCompletion)
+topicRouter.get("", topicController.countTopicCompletion);
 
 export default topicRouter;

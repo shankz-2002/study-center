@@ -39,6 +39,7 @@ function Home() {
 
       if (response.data.success) {
         setFields(response.data.fields);
+        toast.success("Takes max 30 s to load ");
       }
     } catch (error) {
       const err = error as ApiError;

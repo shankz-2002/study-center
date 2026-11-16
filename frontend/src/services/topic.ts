@@ -22,3 +22,6 @@ export const checkTopicCompletion = async (id: string) => {
 export const getTopicsCompleted = async () => {
   return await commonAPI("GET", `${baseUrl}/topic`);
 };
+export const getRecentlyCompletedTopics = async () => {
+  return await commonAPI("GET", `${baseUrl}/topic/recently`);
+};

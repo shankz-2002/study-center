@@ -69,23 +69,33 @@ export class topicController {
       topics,
     });
   };
-  static checkTopicCompletion=async (req:AuthRequest,res:Response) => {
-    const topicId=String(req.params.id);
-    const userId=String(req?.user?.id)
-    const completion=await UserTopicCompletionService.checkTopicCompletion(userId,topicId);
+  static checkTopicCompletion = async (req: AuthRequest, res: Response) => {
+    const topicId = String(req.params.id);
+    const userId = String(req?.user?.id);
+    const completion = await UserTopicCompletionService.checkTopicCompletion(
+      userId,
+      topicId,
+    );
+    res.status(200).json({
+      success: true,
+      completed: !!completion,
+      completion,
+    });
+  };
+  static countTopicCompletion = async (req: AuthRequest, res: Response) => {
+    const userId = String(req.user?.id);
+    const topicsCompleted = await topicService.countTopicCompletion(userId);
+    res.status(200).json({
+      success: true,
+      topicsCompleted,
+    });
+  };
+  static recentlyCompletedTopic = async (req: AuthRequest, res: Response) => {
+    const userId = String(req.user?.id);
+    const recentlyCompleted = await topicService.recentlyCompletedTopic(userId);
     res.status(200).json({
       success:true,
-      completed:!!completion,
-      completion
+      recentlyCompleted
     })
-  }
-  static countTopicCompletion=async (req:AuthRequest,res:Response) => {
-    const userId=String(req.user?.id);
-    const topicsCompleted=await topicService.countTopicCompletion(userId);
-    res.status(200).json({
-      success:true,
-      topicsCompleted
-    })
-    
-  }
+  };
 }

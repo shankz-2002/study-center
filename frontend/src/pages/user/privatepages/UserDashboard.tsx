@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import type { ApiError } from "../../../types/Error";
 import type { User } from "../../../types/User";
@@ -9,9 +8,11 @@ import {
   Avatar,
   Box,
   Card,
+  CardActionArea,
   CardContent,
   Chip,
   Container,
+  Divider,
   Grid,
   LinearProgress,
   Skeleton,
@@ -26,12 +27,19 @@ import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import LayersRoundedIcon from "@mui/icons-material/LayersRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import AutoStoriesRoundedIcon from "@mui/icons-material/AutoStoriesRounded";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
-import { getTopicsCompleted } from "../../../services/topic";
+import { Link as RouterLink } from "react-router-dom";
+
+import {
+  getRecentlyCompletedTopics,
+  getTopicsCompleted,
+} from "../../../services/topic";
 import { getLevelsCompleted } from "../../../services/level";
 import { getContinueLearning } from "../../../services/progress";
 
 import type { ContinueLearningTopic } from "../../../types/Progress";
+import type { RecentlyCompletedTopic } from "../../../types/Topic";
 
 /* ---------------------------------- Types --------------------------------- */
 
@@ -42,11 +50,14 @@ type StatCardProps = {
   accent: string;
 };
 
+type SectionHeaderProps = {
+  icon: React.ReactNode;
+  title: string;
+};
+
 /* ------------------------------- Subcomponents ---------------------------- */
 
 function StatCard({ label, value, icon, accent }: StatCardProps) {
-  const theme = useTheme();
-
   return (
     <Card
       elevation={0}
@@ -61,21 +72,22 @@ function StatCard({ label, value, icon, accent }: StatCardProps) {
 
         "&:hover": {
           transform: "translateY(-3px)",
-          boxShadow: `0 12px 28px -12px ${alpha(
-            theme.palette.common.black,
-            theme.palette.mode === "dark" ? 0.5 : 0.16,
-          )}`,
+          boxShadow: (t) =>
+            `0 12px 28px -12px ${alpha(
+              t.palette.common.black,
+              t.palette.mode === "dark" ? 0.5 : 0.16,
+            )}`,
         },
 
         "&::before": {
           content: '""',
           position: "absolute",
           inset: 0,
-          background: `radial-gradient(
-            circle at top right,
-            ${alpha(accent, theme.palette.mode === "dark" ? 0.22 : 0.12)},
-            transparent 65%
-          )`,
+          background: (t) =>
+            `radial-gradient(circle at top right, ${alpha(
+              accent,
+              t.palette.mode === "dark" ? 0.22 : 0.12,
+            )}, transparent 65%)`,
           pointerEvents: "none",
         },
       }}
@@ -83,10 +95,7 @@ function StatCard({ label, value, icon, accent }: StatCardProps) {
       <CardContent sx={{ p: 3, position: "relative" }}>
         <Stack
           direction="row"
-          sx={{
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
+          sx={{ justifyContent: "space-between", alignItems: "flex-start" }}
         >
           <Box>
             <Typography
@@ -114,10 +123,8 @@ function StatCard({ label, value, icon, accent }: StatCardProps) {
             sx={{
               p: 1.25,
               borderRadius: 3,
-              bgcolor: alpha(
-                accent,
-                theme.palette.mode === "dark" ? 0.2 : 0.1,
-              ),
+              bgcolor: (t) =>
+                alpha(accent, t.palette.mode === "dark" ? 0.2 : 0.1),
               color: accent,
               display: "grid",
               placeItems: "center",
@@ -132,7 +139,7 @@ function StatCard({ label, value, icon, accent }: StatCardProps) {
 }
 
 function ContinueCard({ topic }: { topic: ContinueLearningTopic }) {
-  const theme = useTheme();
+  const safePercentage = Math.min(100, Math.max(0, topic.percentage));
 
   return (
     <Card
@@ -149,10 +156,11 @@ function ContinueCard({ topic }: { topic: ContinueLearningTopic }) {
         "&:hover": {
           transform: "translateY(-3px)",
           borderColor: "success.main",
-          boxShadow: `0 16px 32px -16px ${alpha(
-            theme.palette.success.main,
-            theme.palette.mode === "dark" ? 0.3 : 0.2,
-          )}`,
+          boxShadow: (t) =>
+            `0 16px 32px -16px ${alpha(
+              t.palette.success.main,
+              t.palette.mode === "dark" ? 0.3 : 0.2,
+            )}`,
 
           "& .continue-arrow": {
             transform: "translateX(4px)",
@@ -160,100 +168,125 @@ function ContinueCard({ topic }: { topic: ContinueLearningTopic }) {
         },
       }}
     >
-      <CardContent
-        sx={{
-          p: 3,
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-        }}
+      <CardActionArea
+        component={RouterLink}
+        to={`/topics/${topic.topicId}`}
+        sx={{ height: "100%", borderRadius: 4 }}
       >
-        <Stack
-          direction="row"
+        <CardContent
           sx={{
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 1,
-            gap: 1,
+            p: 3,
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
           }}
         >
-          <Typography
-            variant="h6"
+          <Stack
+            direction="row"
             sx={{
-              fontWeight: 700,
-              color: "text.primary",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 1,
+              gap: 1,
             }}
           >
-            {topic.topicName}
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700, color: "text.primary" }}
+            >
+              {topic.topicName}
+            </Typography>
+
+            <Chip
+              label={`${safePercentage}%`}
+              size="small"
+              color="success"
+              variant="outlined"
+              sx={{ fontWeight: 700 }}
+            />
+          </Stack>
+
+          <Typography color="text.secondary" sx={{ mb: 2, flexGrow: 1 }}>
+            {topic.description}
           </Typography>
 
-          <Chip
-            label={`${topic.percentage}%`}
-            size="small"
-            color="success"
-            variant="outlined"
-            sx={{ fontWeight: 700 }}
-          />
-        </Stack>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.75 }}>
+            {topic.completedLevels} of {topic.totalLevels} levels completed
+          </Typography>
 
-        <Typography
-          color="text.secondary"
-          sx={{ mb: 2, flexGrow: 1 }}
-        >
-          {topic.description}
-        </Typography>
-
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mb: 0.75 }}
-        >
-          {topic.completedLevels} of {topic.totalLevels} levels completed
-        </Typography>
-
-        <LinearProgress
-          variant="determinate"
-          value={Math.min(100, Math.max(0, topic.percentage))}
-          sx={{
-            height: 8,
-            borderRadius: 5,
-            bgcolor: alpha(
-              theme.palette.success.main,
-              theme.palette.mode === "dark" ? 0.2 : 0.12,
-            ),
-
-            "& .MuiLinearProgress-bar": {
+          <LinearProgress
+            variant="determinate"
+            value={safePercentage}
+            sx={{
+              height: 8,
               borderRadius: 5,
-              background: `linear-gradient(
-                90deg,
-                ${theme.palette.success.light},
-                ${theme.palette.success.main}
-              )`,
-            },
-          }}
-        />
-
-        <Stack
-          direction="row"
-          spacing={0.5}
-          sx={{
-            alignItems: "center",
-            mt: 2,
-            color: "success.main",
-            fontWeight: 600,
-          }}
-        >
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Continue
-          </Typography>
-
-          <ArrowForwardRoundedIcon
-            className="continue-arrow"
-            fontSize="small"
-            sx={{ transition: "transform .2s ease" }}
+              bgcolor: (t) =>
+                alpha(
+                  t.palette.success.main,
+                  t.palette.mode === "dark" ? 0.2 : 0.12,
+                ),
+              "& .MuiLinearProgress-bar": {
+                borderRadius: 5,
+                background: (t) =>
+                  `linear-gradient(90deg, ${t.palette.success.light}, ${t.palette.success.main})`,
+              },
+            }}
           />
-        </Stack>
-      </CardContent>
+
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{
+              alignItems: "center",
+              mt: 2,
+              color: "success.main",
+              fontWeight: 600,
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              Continue
+            </Typography>
+
+            <ArrowForwardRoundedIcon
+              className="continue-arrow"
+              fontSize="small"
+              sx={{ transition: "transform .2s ease" }}
+            />
+          </Stack>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
+}
+
+function SectionHeader({ icon, title }: SectionHeaderProps) {
+  return (
+    <Stack direction="row" spacing={1} sx={{ mb: 2, alignItems: "center" }}>
+      {icon}
+      <Typography
+        variant="h5"
+        sx={{ fontWeight: 800, color: "text.primary" }}
+      >
+        {title}
+      </Typography>
+    </Stack>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: 4,
+        bgcolor: "background.paper",
+        border: "1px dashed",
+        borderColor: "divider",
+        p: 4,
+        textAlign: "center",
+      }}
+    >
+      <Typography color="text.secondary">{message}</Typography>
     </Card>
   );
 }
@@ -261,30 +294,18 @@ function ContinueCard({ topic }: { topic: ContinueLearningTopic }) {
 function DashboardSkeleton() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Skeleton
-        variant="rounded"
-        height={140}
-        sx={{ borderRadius: 4, mb: 3 }}
-      />
+      <Skeleton variant="rounded" height={140} sx={{ borderRadius: 4, mb: 3 }} />
 
       <Grid container spacing={3}>
         {[0, 1].map((i) => (
           <Grid key={i} size={{ xs: 12, sm: 6 }}>
-            <Skeleton
-              variant="rounded"
-              height={140}
-              sx={{ borderRadius: 4 }}
-            />
+            <Skeleton variant="rounded" height={140} sx={{ borderRadius: 4 }} />
           </Grid>
         ))}
 
         {[0, 1].map((i) => (
           <Grid key={`c-${i}`} size={{ xs: 12, md: 6 }}>
-            <Skeleton
-              variant="rounded"
-              height={200}
-              sx={{ borderRadius: 4 }}
-            />
+            <Skeleton variant="rounded" height={200} sx={{ borderRadius: 4 }} />
           </Grid>
         ))}
       </Grid>
@@ -306,43 +327,61 @@ function UserDashboard() {
     ContinueLearningTopic[]
   >([]);
 
+  const [recentlyCompleted, setRecentlyCompleted] = useState<
+    RecentlyCompletedTopic[]
+  >([]);
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        setLoading(true);
-
-        const [
-          userResponse,
-          topicsResponse,
-          levelsResponse,
-          continueResponse,
-        ] = await Promise.all([
+        const results = await Promise.allSettled([
           getUserDetails(),
           getTopicsCompleted(),
           getLevelsCompleted(),
           getContinueLearning(),
+          getRecentlyCompletedTopics(),
         ]);
 
-        if (userResponse.data.success) {
-          setUser(userResponse.data.user);
+        const [userRes, topicsRes, levelsRes, continueRes, recentlyRes] =
+          results;
+
+        if (userRes.status === "fulfilled" && userRes.value.data.success) {
+          setUser(userRes.value.data.user);
         }
 
-        if (topicsResponse.data.success) {
-          setTopicsCompleted(topicsResponse.data.topicsCompleted);
+        if (topicsRes.status === "fulfilled" && topicsRes.value.data.success) {
+          setTopicsCompleted(topicsRes.value.data.topicsCompleted);
         }
 
-        if (levelsResponse.data.success) {
-          setLevelsCompleted(levelsResponse.data.levelsCompleted);
+        if (levelsRes.status === "fulfilled" && levelsRes.value.data.success) {
+          setLevelsCompleted(levelsRes.value.data.levelsCompleted);
         }
 
-        if (continueResponse.data.success) {
-          setContinueLearning(continueResponse.data.topics);
+        if (
+          continueRes.status === "fulfilled" &&
+          continueRes.value.data.success
+        ) {
+          setContinueLearning(continueRes.value.data.topics);
+        }
+
+        if (
+          recentlyRes.status === "fulfilled" &&
+          recentlyRes.value.data.success
+        ) {
+          setRecentlyCompleted(recentlyRes.value.data.recentlyCompleted);
+        }
+
+        const rejected = results.find((r) => r.status === "rejected");
+        if (rejected) {
+          const err = (rejected as PromiseRejectedResult).reason as ApiError;
+          toast.warning(
+            err?.data?.message ||
+              "Some dashboard data couldn't be loaded. Please try again.",
+          );
         }
       } catch (error) {
         const err = error as ApiError;
-        toast.error(
-          err.data?.message || "Failed to fetch dashboard data",
-        );
+        toast.error(err.data?.message || "Failed to fetch dashboard data");
       } finally {
         setLoading(false);
       }
@@ -357,6 +396,7 @@ function UserDashboard() {
 
   const initials =
     `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`
+      .trim()
       .toUpperCase() || "U";
 
   const heroTextColor = theme.palette.common.white;
@@ -373,30 +413,28 @@ function UserDashboard() {
           mb: 4,
           color: heroTextColor,
 
-          background:
-            theme.palette.mode === "dark"
-              ? `linear-gradient(
-                  135deg,
-                  ${theme.palette.primary.dark} 0%,
-                  ${theme.palette.background.paper} 100%
-                )`
-              : `linear-gradient(
-                  135deg,
-                  ${theme.palette.primary.dark} 0%,
-                  ${theme.palette.primary.main} 55%,
-                  ${theme.palette.secondary.main} 100%
-                )`,
+          background: (t) =>
+            t.palette.mode === "dark"
+              ? `linear-gradient(135deg, ${t.palette.primary.dark} 0%, ${alpha(
+                  t.palette.primary.main,
+                  0.45,
+                )} 100%)`
+              : `linear-gradient(135deg, ${t.palette.primary.light} 0%, ${alpha(
+                  t.palette.primary.main,
+                  0.85,
+                )} 55%, ${t.palette.secondary.light} 100%)`,
 
           border: "1px solid",
-          borderColor:
-            theme.palette.mode === "dark"
-              ? alpha(theme.palette.primary.light, 0.25)
-              : "transparent",
+          borderColor: (t) =>
+            t.palette.mode === "dark"
+              ? alpha(t.palette.primary.light, 0.25)
+              : alpha(t.palette.primary.main, 0.15),
 
-          boxShadow: `0 20px 44px -22px ${alpha(
-            theme.palette.primary.main,
-            theme.palette.mode === "dark" ? 0.35 : 0.5,
-          )}`,
+          boxShadow: (t) =>
+            `0 20px 44px -22px ${alpha(
+              t.palette.primary.main,
+              t.palette.mode === "dark" ? 0.35 : 0.25,
+            )}`,
 
           "&::after": {
             content: '""',
@@ -406,10 +444,11 @@ function UserDashboard() {
             borderRadius: "50%",
             right: -80,
             top: -120,
-            background: alpha(
-              theme.palette.common.white,
-              theme.palette.mode === "dark" ? 0.04 : 0.1,
-            ),
+            background: (t) =>
+              alpha(
+                t.palette.common.white,
+                t.palette.mode === "dark" ? 0.04 : 0.2,
+              ),
             pointerEvents: "none",
           },
         }}
@@ -430,11 +469,20 @@ function UserDashboard() {
               fontWeight: 800,
               fontSize: 22,
               color: heroTextColor,
-              bgcolor: alpha(theme.palette.common.white, 0.18),
-              border: `2px solid ${alpha(
-                theme.palette.common.white,
-                0.35,
-              )}`,
+              bgcolor: (t) =>
+                alpha(
+                  t.palette.mode === "dark"
+                    ? t.palette.common.white
+                    : t.palette.primary.dark,
+                  0.15,
+                ),
+              border: (t) =>
+                `2px solid ${alpha(
+                  t.palette.mode === "dark"
+                    ? t.palette.common.white
+                    : t.palette.primary.dark,
+                  0.25,
+                )}`,
             }}
           >
             {initials}
@@ -452,12 +500,7 @@ function UserDashboard() {
               Welcome back, {user?.firstName ?? "Learner"}!
             </Typography>
 
-            <Typography
-              sx={{
-                color: alpha(heroTextColor, 0.85),
-                mt: 0.5,
-              }}
-            >
+            <Typography sx={{ color: alpha(heroTextColor, 0.85), mt: 0.5 }}>
               Keep the momentum going — you're doing great.
             </Typography>
           </Box>
@@ -485,54 +528,111 @@ function UserDashboard() {
         </Grid>
       </Grid>
 
-      {/* Continue learning heading */}
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{ mb: 2, alignItems: "center" }}
-      >
-        <AutoStoriesRoundedIcon color="primary" />
+      {/* Continue learning */}
+      <Box sx={{ mb: 4 }}>
+        <SectionHeader
+          icon={<AutoStoriesRoundedIcon color="primary" />}
+          title="Continue Learning"
+        />
 
-        <Typography
-          variant="h5"
-          sx={{
-            fontWeight: 800,
-            color: "text.primary",
-          }}
-        >
-          Continue Learning
-        </Typography>
-      </Stack>
+        {continueLearning.length === 0 ? (
+          <EmptyState message="No topics in progress. Start learning something new!" />
+        ) : (
+          <Grid container spacing={3}>
+            {continueLearning.map((topic) => (
+              <Grid size={{ xs: 12, md: 6 }} key={topic.topicId}>
+                <ContinueCard topic={topic} />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
 
-      {/* Continue learning content */}
-      {continueLearning.length === 0 ? (
-        <Card
-          elevation={0}
-          sx={{
-            borderRadius: 4,
-            bgcolor: "background.paper",
-            border: "1px dashed",
-            borderColor: "divider",
-            p: 4,
-            textAlign: "center",
-          }}
-        >
-          <Typography color="text.secondary">
-            No topics in progress. Start learning something new!
-          </Typography>
-        </Card>
-      ) : (
-        <Grid container spacing={3}>
-          {continueLearning.map((topic) => (
-            <Grid
-              size={{ xs: 12, md: 6 }}
-              key={topic.topicId}
-            >
-              <ContinueCard topic={topic} />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+      {/* Recently completed */}
+      <Box sx={{ mb: 4 }}>
+        <SectionHeader
+          icon={<CheckCircleRoundedIcon color="success" />}
+          title="Recently Completed Topics"
+        />
+
+        {recentlyCompleted.length === 0 ? (
+          <EmptyState message="You haven't completed any topics yet. Start learning to see your achievements here!" />
+        ) : (
+          <Grid container spacing={2}>
+            {recentlyCompleted.map((topic) => (
+              <Grid size={{ xs: 12, md: 4 }} key={topic.topicId}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    height: "100%",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 3,
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <CardContent>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ alignItems: "center", mb: 2 }}
+                    >
+                      <Avatar
+                        sx={{
+                          bgcolor: (t) => alpha(t.palette.success.main, 0.12),
+                          color: "success.main",
+                        }}
+                      >
+                        <AutoStoriesRoundedIcon />
+                      </Avatar>
+
+                      <Chip label="Completed" color="success" size="small" />
+                    </Stack>
+
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                      {topic.topicName}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary">
+                      {topic.categoryName} · {topic.fieldName}
+                    </Typography>
+
+                    <Divider sx={{ my: 2 }} />
+
+                    <Stack
+                      direction="row"
+                      sx={{
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Final score
+                      </Typography>
+
+                      <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                        {topic.percentage}%
+                      </Typography>
+                    </Stack>
+
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block", mt: 1 }}
+                    >
+                      Completed on{" "}
+                      {new Date(topic.completedAt).toLocaleDateString(
+                        undefined,
+                        { year: "numeric", month: "short", day: "numeric" },
+                      )}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
     </Container>
   );
 }
