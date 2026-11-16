@@ -1,7 +1,9 @@
+
 import { useState } from "react";
 import { loginApi, sendCredential } from "../../../services/auth";
 import { useAuth } from "../../../context/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Button,
@@ -29,12 +31,16 @@ function Login() {
     email: "",
     password: "",
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
@@ -51,7 +57,6 @@ function Login() {
       const { user, accessToken } = response.data.result;
 
       login(user, accessToken);
-
       toast.success("Login Successful");
 
       if (user.role === "ADMIN") {
@@ -60,7 +65,6 @@ function Login() {
         navigate("/home");
       }
     } catch (error) {
-      console.log("testing");
       const err = error as ApiError;
       toast.error(err?.data?.message || "Login Failed");
       console.error("Google authentication error:", error);
@@ -71,6 +75,7 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
       setLoading(true);
       const response = await loginApi(form);
@@ -78,7 +83,8 @@ function Login() {
       if (response.data.success) {
         toast.success("Login successful");
         login(response.data.result.user, response.data.result.accessToken);
-        if (response?.data.result.user.role === "ADMIN") {
+
+        if (response.data.result.user.role === "ADMIN") {
           navigate("/admin/dashboard");
         } else {
           navigate("/home");
@@ -92,29 +98,47 @@ function Login() {
     }
   };
 
-  // ---- Design tokens (match Navbar + Home) ----
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
 
   const inputSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "14px",
-      backgroundColor: "rgba(255, 255, 255, 0.75)",
+      backgroundColor: "background.default",
       transition: "box-shadow 0.2s ease, background-color 0.2s ease",
-      "& fieldset": { borderColor: "rgba(15, 23, 42, 0.10)" },
-      "&:hover fieldset": { borderColor: "rgba(99, 102, 241, 0.35)" },
-      "&.Mui-focused": { boxShadow: "0 0 0 4px rgba(99, 102, 241, 0.14)" },
+
+      "& fieldset": {
+        borderColor: "divider",
+      },
+
+      "&:hover fieldset": {
+        borderColor: "primary.main",
+      },
+
+      "&.Mui-focused": {
+        boxShadow: "0 0 0 4px rgba(99, 102, 241, 0.14)",
+      },
+
       "&.Mui-focused fieldset": {
-        borderColor: "#6366f1",
+        borderColor: "primary.main",
         borderWidth: "1.5px",
       },
     },
+
     "& .MuiInputLabel-root": {
-      color: "#64748b",
+      color: "text.secondary",
       fontWeight: 500,
-      "&.Mui-focused": { color: "#4f46e5", fontWeight: 600 },
+
+      "&.Mui-focused": {
+        color: "primary.main",
+        fontWeight: 600,
+      },
     },
-    "& .MuiInputBase-input": { fontWeight: 500, color: "#0f172a" },
+
+    "& .MuiInputBase-input": {
+      fontWeight: 500,
+      color: "text.primary",
+    },
   };
 
   return (
@@ -125,28 +149,33 @@ function Login() {
         alignItems: "center",
         justifyContent: "center",
         py: { xs: 6, md: 8 },
-        background:
-          "radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%), " +
-          "radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%), " +
-          "#fafaff",
+
+        background: `
+          radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%),
+          radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%),
+          ${theme.palette.background.default}
+        `,
       }}
     >
       <Container maxWidth="sm">
-        {/* ---------------- Card ---------------- */}
         <Box
           sx={{
             position: "relative",
             maxWidth: 460,
             mx: "auto",
             borderRadius: "24px",
-            background: "rgba(255, 255, 255, 0.85)",
+            bgcolor: "background.paper",
             backdropFilter: "saturate(180%) blur(20px)",
-            WebkitBackdropFilter: "saturate(180%) blur(20px)",
-            border: "1px solid rgba(15, 23, 42, 0.06)",
-            boxShadow:
-              "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
+            border: 1,
+            borderColor: "divider",
+
+            boxShadow: isDark
+              ? "0 30px 60px -30px rgba(0,0,0,0.7)"
+              : "0 30px 60px -30px rgba(99,102,241,0.35), 0 10px 24px -12px rgba(139,92,246,0.20)",
+
             overflow: "hidden",
             p: { xs: 3.5, sm: 4.5 },
+
             "&::before": {
               content: '""',
               position: "absolute",
@@ -158,7 +187,7 @@ function Login() {
             },
           }}
         >
-          {/* ---------------- Brand mark + heading ---------------- */}
+          {/* Brand mark and heading */}
           <Box sx={{ textAlign: "center", mb: 4 }}>
             <Box
               sx={{
@@ -171,7 +200,7 @@ function Login() {
                 mx: "auto",
                 mb: 2.5,
                 boxShadow:
-                  "0 12px 24px -10px rgba(99, 102, 241, 0.65), inset 0 1px 0 rgba(255,255,255,0.35)",
+                  "0 12px 24px -10px rgba(99,102,241,0.65), inset 0 1px 0 rgba(255,255,255,0.35)",
               }}
             >
               <AutoStoriesIcon sx={{ color: "#fff", fontSize: 28 }} />
@@ -183,7 +212,7 @@ function Login() {
               sx={{
                 fontWeight: 800,
                 letterSpacing: "-0.8px",
-                color: "#0f172a",
+                color: "text.primary",
                 mb: 0.75,
                 fontSize: { xs: "1.6rem", sm: "1.85rem" },
               }}
@@ -193,13 +222,17 @@ function Login() {
 
             <Typography
               variant="body2"
-              sx={{ color: "#64748b", fontWeight: 500, fontSize: "0.92rem" }}
+              sx={{
+                color: "text.secondary",
+                fontWeight: 500,
+                fontSize: "0.92rem",
+              }}
             >
               Login to continue your learning journey
             </Typography>
           </Box>
 
-          {/* ---------------- Form ---------------- */}
+          {/* Form */}
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -220,7 +253,7 @@ function Login() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <EmailOutlinedIcon
-                        sx={{ fontSize: 20, color: "#94a3b8" }}
+                        sx={{ fontSize: 20, color: "text.secondary" }}
                       />
                     </InputAdornment>
                   ),
@@ -243,10 +276,11 @@ function Login() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <LockOutlinedIcon
-                        sx={{ fontSize: 20, color: "#94a3b8" }}
+                        sx={{ fontSize: 20, color: "text.secondary" }}
                       />
                     </InputAdornment>
                   ),
+
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
@@ -254,8 +288,8 @@ function Login() {
                         edge="end"
                         size="small"
                         sx={{
-                          color: "#94a3b8",
-                          "&:hover": { color: "#4f46e5" },
+                          color: "text.secondary",
+                          "&:hover": { color: "primary.main" },
                         }}
                         aria-label={
                           showPassword ? "Hide password" : "Show password"
@@ -273,7 +307,7 @@ function Login() {
               }}
             />
 
-            {/* Forgot password link */}
+            {/* Forgot password */}
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: -1 }}>
               <Typography
                 component="a"
@@ -281,10 +315,9 @@ function Login() {
                 sx={{
                   fontSize: "0.83rem",
                   fontWeight: 600,
-                  color: "#4f46e5",
+                  color: "primary.main",
                   textDecoration: "none",
-                  transition: "color 0.2s ease",
-                  "&:hover": { color: "#8b5cf6" },
+                  "&:hover": { color: "secondary.main" },
                 }}
               >
                 Forgot password?
@@ -312,21 +345,29 @@ function Login() {
                 backgroundSize: "200% 200%",
                 color: "#fff",
                 boxShadow:
-                  "0 12px 24px -10px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
+                  "0 12px 24px -10px rgba(99,102,241,0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
                 transition: "all 0.3s ease",
+
                 "&:hover": {
                   backgroundPosition: "100% 50%",
                   boxShadow:
-                    "0 16px 32px -10px rgba(139, 92, 246, 0.85), inset 0 1px 0 rgba(255,255,255,0.3)",
+                    "0 16px 32px -10px rgba(139,92,246,0.85)",
                   transform: "translateY(-1px)",
                 },
+
                 "&:disabled": {
                   background:
-                    "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
+                    "linear-gradient(135deg, #64748b 0%, #94a3b8 100%)",
                   color: "#fff",
                 },
-                "& .MuiButton-endIcon": { transition: "transform 0.25s ease" },
-                "&:hover .MuiButton-endIcon": { transform: "translateX(3px)" },
+
+                "& .MuiButton-endIcon": {
+                  transition: "transform 0.25s ease",
+                },
+
+                "&:hover .MuiButton-endIcon": {
+                  transform: "translateX(3px)",
+                },
               }}
             >
               {loading ? (
@@ -340,18 +381,18 @@ function Login() {
             <Divider
               sx={{
                 my: 1,
-                color: "#94a3b8",
+                color: "text.secondary",
                 fontSize: "0.78rem",
                 fontWeight: 500,
                 "&::before, &::after": {
-                  borderColor: "rgba(15, 23, 42, 0.08)",
+                  borderColor: "divider",
                 },
               }}
             >
               OR
             </Divider>
 
-            {/* Google Login — INSIDE the card, below the OR divider */}
+            {/* Google Login */}
             <Box
               sx={{
                 display: "flex",
@@ -371,12 +412,13 @@ function Login() {
                 onError={() => {
                   toast.error("Google login failed");
                 }}
-                theme="outline"
+                theme={isDark ? "filled_black" : "outline"}
                 size="large"
                 width="340"
                 shape="pill"
                 text="continue_with"
               />
+
               {googleLoading && (
                 <CircularProgress
                   size={22}
@@ -386,7 +428,7 @@ function Login() {
                     left: "50%",
                     mt: "-11px",
                     ml: "-11px",
-                    color: "#6366f1",
+                    color: "primary.main",
                   }}
                 />
               )}
@@ -397,7 +439,7 @@ function Login() {
               variant="body2"
               sx={{
                 textAlign: "center",
-                color: "#64748b",
+                color: "text.secondary",
                 fontSize: "0.9rem",
                 mt: 0.5,
               }}
@@ -408,11 +450,10 @@ function Login() {
                 href="/register"
                 sx={{
                   fontWeight: 700,
-                  color: "#4f46e5",
+                  color: "primary.main",
                   textDecoration: "none",
-                  transition: "color 0.2s ease",
                   "&:hover": {
-                    color: "#8b5cf6",
+                    color: "secondary.main",
                     textDecoration: "underline",
                   },
                 }}

@@ -1,13 +1,22 @@
+
 import { Navigate, Route, Routes } from "react-router-dom";
+import { Box, useTheme } from "@mui/material";
+import { ToastContainer } from "react-toastify";
+
 import Home from "./pages/user/publicpages/Home";
 import Register from "./pages/user/publicpages/Register";
 import Login from "./pages/user/publicpages/Login";
+import ForgottenPassword from "./pages/user/publicpages/ForgottenPassword";
+import ResetPassword from "./pages/user/publicpages/ResetPassword";
+
 import ProtectedRouteLayout from "./layout/ProtectedRouteLayout";
 import Field from "./pages/user/privatepages/Field";
-import { ToastContainer } from "react-toastify";
 import Category from "./pages/user/privatepages/Category";
 import Topic from "./pages/user/privatepages/Topic";
+import Profile from "./pages/user/privatepages/Profile";
+
 import Navbar from "./components/Navbar";
+
 import AdminDashBoard from "./pages/admin/AdminDashBoard";
 import AdminLayout from "./layout/AdminLayout";
 import { AdminFields } from "./pages/admin/AdminFields";
@@ -17,14 +26,20 @@ import AdminLevel from "./pages/admin/AdminLevel";
 import AdminContents from "./pages/admin/AdminContents";
 import AdminQuestions from "./pages/admin/AdminQuestions";
 import AdminUsers from "./pages/admin/AdminUsers";
-import ForgottenPassword from "./pages/user/publicpages/ForgottenPassword";
-import Profile from "./pages/user/privatepages/Profile";
-import ResetPassword from "./pages/user/publicpages/ResetPassword";
 
 function App() {
+  const theme = useTheme();
+
   return (
-    <>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: theme.palette.background.default,
+        color: theme.palette.text.primary,
+      }}
+    >
       <Navbar />
+
       <ToastContainer position="top-right" autoClose={2000} />
 
       <Routes>
@@ -58,7 +73,7 @@ function App() {
           </Route>
         </Route>
       </Routes>
-    </>
+    </Box>
   );
 }
 

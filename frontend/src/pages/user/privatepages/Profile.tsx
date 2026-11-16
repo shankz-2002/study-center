@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import type { ApiError } from "../../../types/Error";
 import type { User } from "../../../types/User";
@@ -13,6 +14,7 @@ import {
   Avatar,
   Typography,
   Divider,
+  useTheme,
 } from "@mui/material";
 
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -30,6 +32,9 @@ function Profile() {
     firstName: "",
     lastName: "",
   });
+
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -55,10 +60,12 @@ function Profile() {
 
   const handleEdit = () => {
     if (!user) return;
+
     setFormData({
       firstName: user.firstName,
       lastName: user.lastName,
     });
+
     setOpenModal(true);
   };
 
@@ -80,14 +87,27 @@ function Profile() {
   // ---- Design tokens ----
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
-  const brandGradientSoft =
-    "linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.12) 50%, rgba(236,72,153,0.12) 100%)";
-  const pageBackground =
-    "radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.10), transparent 60%), " +
-    "radial-gradient(1000px 500px at 110% 0%, rgba(236,72,153,0.08), transparent 60%), " +
-    "#fafaff";
 
-  /* ---------------- Loading (initial fetch) ---------------- */
+  const brandGradientSoft = isDark
+    ? "linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(139,92,246,0.18) 50%, rgba(236,72,153,0.16) 100%)"
+    : "linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.12) 50%, rgba(236,72,153,0.12) 100%)";
+
+  const pageBackground = isDark
+    ? `radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.16), transparent 60%),
+       radial-gradient(1000px 500px at 110% 0%, rgba(236,72,153,0.12), transparent 60%),
+       ${theme.palette.background.default}`
+    : `radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.10), transparent 60%),
+       radial-gradient(1000px 500px at 110% 0%, rgba(236,72,153,0.08), transparent 60%),
+       ${theme.palette.background.default}`;
+
+  const cardBackground = theme.palette.background.paper;
+  const cardBorder = theme.palette.divider;
+
+  const cardShadow = isDark
+    ? "0 30px 60px -30px rgba(0, 0, 0, 0.65), 0 10px 24px -12px rgba(99, 102, 241, 0.18)"
+    : "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.2)";
+
+  /* ---------------- Loading ---------------- */
   if (loading && !user) {
     return (
       <Box
@@ -106,10 +126,13 @@ function Profile() {
             size={56}
             thickness={4}
             sx={{
-              color: "#6366f1",
-              "& .MuiCircularProgress-circle": { strokeLinecap: "round" },
+              color: theme.palette.primary.main,
+              "& .MuiCircularProgress-circle": {
+                strokeLinecap: "round",
+              },
             }}
           />
+
           <Box
             sx={{
               position: "absolute",
@@ -118,11 +141,22 @@ function Profile() {
               placeItems: "center",
             }}
           >
-            <AutoStoriesIcon sx={{ fontSize: 22, color: "#8b5cf6" }} />
+            <AutoStoriesIcon
+              sx={{
+                fontSize: 22,
+                color: theme.palette.secondary.main,
+              }}
+            />
           </Box>
         </Box>
 
-        <Typography variant="body2" sx={{ color: "#94a3b8", fontWeight: 500 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+          }}
+        >
           Loading profile…
         </Typography>
       </Box>
@@ -149,7 +183,7 @@ function Profile() {
               height: 72,
               borderRadius: "20px",
               background: brandGradientSoft,
-              color: "#8b5cf6",
+              color: theme.palette.secondary.main,
               display: "grid",
               placeItems: "center",
               mx: "auto",
@@ -163,7 +197,7 @@ function Profile() {
             variant="h6"
             sx={{
               fontWeight: 700,
-              color: "#0f172a",
+              color: theme.palette.text.primary,
               mb: 1,
               letterSpacing: "-0.3px",
             }}
@@ -173,7 +207,10 @@ function Profile() {
 
           <Typography
             variant="body2"
-            sx={{ color: "#64748b", lineHeight: 1.65 }}
+            sx={{
+              color: theme.palette.text.secondary,
+              lineHeight: 1.65,
+            }}
           >
             Something went wrong while fetching your details. Please try again
             later.
@@ -187,7 +224,10 @@ function Profile() {
     user.firstName?.charAt(0)?.toUpperCase() ||
     user.lastName?.charAt(0)?.toUpperCase() ||
     "U";
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
+
+  const fullName = [user.firstName, user.lastName]
+    .filter(Boolean)
+    .join(" ");
 
   /* ---------------- Main layout ---------------- */
   return (
@@ -210,16 +250,20 @@ function Profile() {
               fontWeight: 800,
               letterSpacing: "-1.2px",
               fontSize: { xs: "1.9rem", md: "2.4rem" },
-              color: "#0f172a",
+              color: theme.palette.text.primary,
               lineHeight: 1.15,
               mb: 0.75,
             }}
           >
             My profile
           </Typography>
+
           <Typography
             variant="body1"
-            sx={{ color: "#64748b", fontSize: { xs: "0.95rem", md: "1rem" } }}
+            sx={{
+              color: theme.palette.text.secondary,
+              fontSize: { xs: "0.95rem", md: "1rem" },
+            }}
           >
             Manage your personal information
           </Typography>
@@ -230,13 +274,13 @@ function Profile() {
           sx={{
             position: "relative",
             borderRadius: "24px",
-            background: "rgba(255, 255, 255, 0.85)",
+            background: cardBackground,
             backdropFilter: "saturate(180%) blur(20px)",
             WebkitBackdropFilter: "saturate(180%) blur(20px)",
-            border: "1px solid rgba(15, 23, 42, 0.06)",
-            boxShadow:
-              "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.2)",
+            border: `1px solid ${cardBorder}`,
+            boxShadow: cardShadow,
             overflow: "hidden",
+
             "&::before": {
               content: '""',
               position: "absolute",
@@ -248,7 +292,7 @@ function Profile() {
             },
           }}
         >
-          {/* ----- Hero (avatar + name + edit) ----- */}
+          {/* ----- Hero ----- */}
           <Box
             sx={{
               display: "flex",
@@ -260,7 +304,7 @@ function Profile() {
               pb: { xs: 2.5, md: 3 },
             }}
           >
-            {/* Avatar with gradient ring */}
+            {/* Avatar */}
             <Box
               sx={{
                 p: "3px",
@@ -275,12 +319,12 @@ function Profile() {
                 sx={{
                   width: { xs: 72, md: 88 },
                   height: { xs: 72, md: 88 },
-                  bgcolor: "#fff",
-                  color: "#4f46e5",
+                  bgcolor: theme.palette.background.paper,
+                  color: theme.palette.primary.main,
                   fontSize: { xs: "1.6rem", md: "2rem" },
                   fontWeight: 800,
                   letterSpacing: "-1px",
-                  border: "3px solid #fff",
+                  border: `3px solid ${theme.palette.background.paper}`,
                 }}
               >
                 {userInitial}
@@ -295,7 +339,7 @@ function Profile() {
                 sx={{
                   fontWeight: 800,
                   letterSpacing: "-0.6px",
-                  color: "#0f172a",
+                  color: theme.palette.text.primary,
                   fontSize: { xs: "1.25rem", md: "1.5rem" },
                   lineHeight: 1.2,
                   mb: 0.5,
@@ -309,17 +353,22 @@ function Profile() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 0.75,
-                  color: "#64748b",
+                  color: theme.palette.text.secondary,
                   fontSize: "0.9rem",
                   justifyContent: { xs: "center", sm: "flex-start" },
                 }}
               >
-                <EmailOutlinedIcon sx={{ fontSize: 16, color: "#94a3b8" }} />
+                <EmailOutlinedIcon
+                  sx={{
+                    fontSize: 16,
+                    color: theme.palette.text.disabled,
+                  }}
+                />
                 {user.email}
               </Box>
             </Box>
 
-            {/* Edit button (desktop) */}
+            {/* Edit button desktop */}
             <Button
               onClick={handleEdit}
               variant="contained"
@@ -339,6 +388,7 @@ function Profile() {
                 boxShadow:
                   "0 10px 22px -10px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
                 transition: "all 0.3s ease",
+
                 "&:hover": {
                   backgroundPosition: "100% 50%",
                   boxShadow:
@@ -351,7 +401,7 @@ function Profile() {
             </Button>
           </Box>
 
-          {/* Edit button (mobile, full-width) */}
+          {/* Edit button mobile */}
           <Box sx={{ display: { xs: "block", sm: "none" }, px: 3, pb: 3 }}>
             <Button
               onClick={handleEdit}
@@ -375,7 +425,7 @@ function Profile() {
             </Button>
           </Box>
 
-          <Divider sx={{ borderColor: "rgba(15, 23, 42, 0.06)" }} />
+          <Divider sx={{ borderColor: theme.palette.divider }} />
 
           {/* ----- Details list ----- */}
           <Box sx={{ p: { xs: 3, md: 4 }, pt: { xs: 2.5, md: 3 } }}>
@@ -385,7 +435,7 @@ function Profile() {
                 fontWeight: 700,
                 letterSpacing: "0.4px",
                 textTransform: "uppercase",
-                color: "#94a3b8",
+                color: theme.palette.text.secondary,
                 mb: 2,
               }}
             >
@@ -398,17 +448,18 @@ function Profile() {
                 label="First name"
                 value={user.firstName || "—"}
               />
+
               <InfoRow
                 icon={<PersonOutlineOutlinedIcon sx={{ fontSize: 18 }} />}
                 label="Last name"
                 value={user.lastName || "—"}
               />
+
               <InfoRow
                 icon={<EmailOutlinedIcon sx={{ fontSize: 18 }} />}
                 label="Email"
                 value={user.email}
               />
-             
             </Box>
           </Box>
         </Box>
@@ -436,6 +487,9 @@ interface InfoRowProps {
 }
 
 function InfoRow({ icon, label, value, capitalize }: InfoRowProps) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   return (
     <Box
       sx={{
@@ -443,8 +497,10 @@ function InfoRow({ icon, label, value, capitalize }: InfoRowProps) {
         alignItems: "center",
         gap: 1.5,
         borderRadius: "14px",
-        background: "rgba(15, 23, 42, 0.03)",
-        border: "1px solid rgba(15, 23, 42, 0.05)",
+        backgroundColor: isDark
+          ? "rgba(148, 163, 184, 0.07)"
+          : "rgba(15, 23, 42, 0.03)",
+        border: `1px solid ${theme.palette.divider}`,
         px: 2,
         py: 1.5,
       }}
@@ -454,9 +510,13 @@ function InfoRow({ icon, label, value, capitalize }: InfoRowProps) {
           width: 34,
           height: 34,
           borderRadius: "10px",
-          background: "rgba(99, 102, 241, 0.10)",
-          border: "1px solid rgba(99, 102, 241, 0.15)",
-          color: "#6366f1",
+          backgroundColor: isDark
+            ? "rgba(129, 140, 248, 0.16)"
+            : "rgba(99, 102, 241, 0.10)",
+          border: isDark
+            ? "1px solid rgba(129, 140, 248, 0.25)"
+            : "1px solid rgba(99, 102, 241, 0.15)",
+          color: theme.palette.primary.main,
           display: "grid",
           placeItems: "center",
           flexShrink: 0,
@@ -472,17 +532,18 @@ function InfoRow({ icon, label, value, capitalize }: InfoRowProps) {
             fontWeight: 700,
             letterSpacing: "0.3px",
             textTransform: "uppercase",
-            color: "#94a3b8",
+            color: theme.palette.text.secondary,
             mb: 0.15,
           }}
         >
           {label}
         </Typography>
+
         <Typography
           sx={{
             fontSize: "0.95rem",
             fontWeight: 600,
-            color: "#0f172a",
+            color: theme.palette.text.primary,
             letterSpacing: "-0.2px",
             textTransform: capitalize ? "capitalize" : "none",
             wordBreak: "break-word",

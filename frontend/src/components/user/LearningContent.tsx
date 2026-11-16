@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import type {
   LearningContentProps,
@@ -6,7 +7,13 @@ import type {
 import { getLearningContent } from "../../services/learningContent";
 import type { ApiError } from "../../types/Error";
 import { toast } from "react-toastify";
-import { Box, CircularProgress, Typography, Divider } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Divider,
+  useTheme,
+} from "@mui/material";
 
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
@@ -15,11 +22,26 @@ function LearningContent({ levelId }: LearningContentProps) {
   const [learning, setLearning] = useState<LearningContentType[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
+  const brandGradient =
+    "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
+
+  const containerBackground = isDark
+    ? "rgba(30, 41, 59, 0.75)"
+    : "rgba(255, 255, 255, 0.85)";
+
+  const containerBorder = isDark
+    ? "rgba(148, 163, 184, 0.14)"
+    : "rgba(15, 23, 42, 0.06)";
+
   useEffect(() => {
     const fetchLearningContent = async () => {
       try {
         setLoading(true);
         const response = await getLearningContent(levelId);
+
         if (response?.data?.success) {
           setLearning(response?.data?.learning);
         }
@@ -30,11 +52,9 @@ function LearningContent({ levelId }: LearningContentProps) {
         setLoading(false);
       }
     };
+
     fetchLearningContent();
   }, [levelId]);
-
-  const brandGradient =
-    "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
 
   /* ---------------- Loading ---------------- */
   if (loading) {
@@ -48,10 +68,10 @@ function LearningContent({ levelId }: LearningContentProps) {
           gap: 2,
           minHeight: 240,
           borderRadius: "20px",
-          background: "rgba(255, 255, 255, 0.85)",
+          background: containerBackground,
           backdropFilter: "saturate(180%) blur(20px)",
           WebkitBackdropFilter: "saturate(180%) blur(20px)",
-          border: "1px solid rgba(15, 23, 42, 0.06)",
+          border: `1px solid ${containerBorder}`,
         }}
       >
         <Box sx={{ position: "relative", display: "inline-flex" }}>
@@ -59,10 +79,13 @@ function LearningContent({ levelId }: LearningContentProps) {
             size={48}
             thickness={4}
             sx={{
-              color: "#6366f1",
-              "& .MuiCircularProgress-circle": { strokeLinecap: "round" },
+              color: theme.palette.primary.main,
+              "& .MuiCircularProgress-circle": {
+                strokeLinecap: "round",
+              },
             }}
           />
+
           <Box
             sx={{
               position: "absolute",
@@ -71,11 +94,22 @@ function LearningContent({ levelId }: LearningContentProps) {
               placeItems: "center",
             }}
           >
-            <AutoStoriesIcon sx={{ fontSize: 20, color: "#8b5cf6" }} />
+            <AutoStoriesIcon
+              sx={{
+                fontSize: 20,
+                color: theme.palette.secondary.main,
+              }}
+            />
           </Box>
         </Box>
 
-        <Typography variant="body2" sx={{ color: "#94a3b8", fontWeight: 500 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+          }}
+        >
           Loading content…
         </Typography>
       </Box>
@@ -88,22 +122,27 @@ function LearningContent({ levelId }: LearningContentProps) {
       <Box
         sx={{
           borderRadius: "20px",
-          background: "rgba(255, 255, 255, 0.85)",
+          background: containerBackground,
           backdropFilter: "saturate(180%) blur(20px)",
           WebkitBackdropFilter: "saturate(180%) blur(20px)",
-          border: "1px solid rgba(15, 23, 42, 0.06)",
+          border: `1px solid ${containerBorder}`,
           p: 4,
           textAlign: "center",
         }}
       >
-        <Typography sx={{ color: "#64748b", fontWeight: 500 }}>
+        <Typography
+          sx={{
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+          }}
+        >
           No content available for this level yet.
         </Typography>
       </Box>
     );
   }
 
-  /* ---------------- Content (single flowing page) ---------------- */
+  /* ---------------- Content ---------------- */
   return (
     <Box>
       {/* ---------------- Section header ---------------- */}
@@ -139,15 +178,20 @@ function LearningContent({ levelId }: LearningContentProps) {
             sx={{
               fontWeight: 800,
               letterSpacing: "-0.6px",
-              color: "#0f172a",
+              color: theme.palette.text.primary,
               lineHeight: 1.2,
             }}
           >
             Learning content
           </Typography>
+
           <Typography
             variant="body2"
-            sx={{ color: "#64748b", fontWeight: 500, mt: 0.25 }}
+            sx={{
+              color: theme.palette.text.secondary,
+              fontWeight: 500,
+              mt: 0.25,
+            }}
           >
             {learning.length} lesson{learning.length === 1 ? "" : "s"} in this
             level
@@ -155,7 +199,7 @@ function LearningContent({ levelId }: LearningContentProps) {
         </Box>
       </Box>
 
-      {/* ---------------- Lessons (flowing, no cards) ---------------- */}
+      {/* ---------------- Lessons ---------------- */}
       <Box sx={{ mt: 3 }}>
         {learning.map((learn, index) => (
           <Box key={learn.id}>
@@ -175,9 +219,13 @@ function LearningContent({ levelId }: LearningContentProps) {
                     height: 38,
                     flexShrink: 0,
                     borderRadius: "10px",
-                    background: "rgba(99, 102, 241, 0.10)",
-                    border: "1px solid rgba(99, 102, 241, 0.18)",
-                    color: "#4f46e5",
+                    background: isDark
+                      ? "rgba(129, 140, 248, 0.16)"
+                      : "rgba(99, 102, 241, 0.10)",
+                    border: isDark
+                      ? "1px solid rgba(129, 140, 248, 0.25)"
+                      : "1px solid rgba(99, 102, 241, 0.18)",
+                    color: theme.palette.primary.main,
                     display: "grid",
                     placeItems: "center",
                     fontWeight: 800,
@@ -194,7 +242,7 @@ function LearningContent({ levelId }: LearningContentProps) {
                       fontWeight: 700,
                       fontSize: { xs: "1.1rem", md: "1.25rem" },
                       letterSpacing: "-0.4px",
-                      color: "#0f172a",
+                      color: theme.palette.text.primary,
                       lineHeight: 1.35,
                     }}
                   >
@@ -207,12 +255,12 @@ function LearningContent({ levelId }: LearningContentProps) {
                       alignItems: "center",
                       gap: 0.5,
                       mt: 0.5,
-                      color: "#6366f1",
+                      color: theme.palette.primary.main,
                       fontSize: "0.72rem",
                       fontWeight: 700,
                       letterSpacing: "0.4px",
                       textTransform: "uppercase",
-                      opacity: 0.85,
+                      opacity: 0.9,
                     }}
                   >
                     <MenuBookOutlinedIcon sx={{ fontSize: 14 }} />
@@ -221,7 +269,7 @@ function LearningContent({ levelId }: LearningContentProps) {
                 </Box>
               </Box>
 
-              {/* Lesson body — indented to align with title, not number */}
+              {/* Lesson body */}
               <Box
                 sx={{
                   pl: { xs: 0, md: 6.5 },
@@ -230,7 +278,7 @@ function LearningContent({ levelId }: LearningContentProps) {
               >
                 <Typography
                   sx={{
-                    color: "#475569",
+                    color: theme.palette.text.secondary,
                     lineHeight: 1.9,
                     fontSize: { xs: "0.95rem", md: "1rem" },
                     whiteSpace: "pre-wrap",
@@ -241,9 +289,13 @@ function LearningContent({ levelId }: LearningContentProps) {
               </Box>
             </Box>
 
-            {/* Divider between lessons (not after the last) */}
+            {/* Divider between lessons */}
             {index < learning.length - 1 && (
-              <Divider sx={{ borderColor: "rgba(15, 23, 42, 0.08)" }} />
+              <Divider
+                sx={{
+                  borderColor: theme.palette.divider,
+                }}
+              />
             )}
           </Box>
         ))}

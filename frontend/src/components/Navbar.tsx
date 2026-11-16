@@ -1,4 +1,6 @@
 import { useState } from "react";
+import type { MouseEvent } from "react";
+
 import {
   AppBar,
   Toolbar,
@@ -18,6 +20,9 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+
+import { useTheme } from "@mui/material/styles";
+
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
@@ -26,10 +31,19 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import { useAuth } from "../context/useAuth";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 
+import { useAuth } from "../context/useAuth";
+import { useThemeMode } from "../theme/ThemeContextStore";
 function Navbar() {
   const { user, logout } = useAuth();
+
+  const theme = useTheme();
+  const { mode, toggleTheme } = useThemeMode();
+
+  const isDark = mode === "dark";
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -39,18 +53,20 @@ function Navbar() {
     "U";
 
   // ---- Design tokens ----
+
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
-  const navTextColor = "#334155";
-  const navHoverBg = "rgba(99, 102, 241, 0.08)";
-  const navHoverColor = "#4f46e5";
+
+  const navTextColor = theme.palette.text.primary;
+  const navHoverBg = theme.palette.action.hover;
+  const navHoverColor = theme.palette.primary.main;
 
   const navButtonSx = {
     color: navTextColor,
     fontWeight: 600,
     fontSize: "0.9rem",
     letterSpacing: "-0.1px",
-    textTransform: "none",
+    textTransform: "none" as const,
     borderRadius: "12px",
     px: 2,
     py: 1,
@@ -62,13 +78,20 @@ function Navbar() {
     },
   };
 
-  const handleDrawerToggle = () => setDrawerOpen((v) => !v);
+  const handleDrawerToggle = () => {
+    setDrawerOpen((previous) => !previous);
+  };
 
-  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) =>
+  const handleMenuOpen = (e: MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
+  };
 
-  /* ---------------- Admin nav items ---------------- */
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  // ---- Admin navigation items ----
+
   const adminItems = [
     {
       label: "Admin Dashboard",
@@ -82,28 +105,49 @@ function Navbar() {
     },
   ];
 
+  // ---- Theme toggle button ----
+
+  const themeToggle = (
+    <Tooltip
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      arrow
+    >
+      <IconButton
+        onClick={toggleTheme}
+        aria-label="Toggle theme"
+        sx={{
+          color: "text.primary",
+          borderRadius: "10px",
+          "&:hover": {
+            backgroundColor: "action.hover",
+          },
+        }}
+      >
+        {isDark ? <LightModeIcon /> : <DarkModeIcon />}
+      </IconButton>
+    </Tooltip>
+  );
+
   return (
     <AppBar
       position="sticky"
       elevation={0}
       sx={{
-        backgroundColor: "rgba(255, 255, 255, 0.72)",
+        backgroundColor: isDark
+          ? "rgba(15, 23, 42, 0.92)"
+          : "rgba(255, 255, 255, 0.82)",
+
         backdropFilter: "saturate(180%) blur(20px)",
         WebkitBackdropFilter: "saturate(180%) blur(20px)",
-        color: "#0f172a",
-        borderBottom: "1px solid rgba(15, 23, 42, 0.06)",
-        boxShadow:
-          "0 1px 0 rgba(15, 23, 42, 0.02), 0 8px 24px -12px rgba(99, 102, 241, 0.12)",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "3px",
-          background: brandGradient,
-          opacity: 0.9,
-        },
+
+        color: "text.primary",
+
+        borderBottom: 1,
+        borderColor: "divider",
+
+        boxShadow: isDark
+          ? "0 4px 20px rgba(0,0,0,0.2)"
+          : "0 8px 24px -12px rgba(99, 102, 241, 0.12)",
       }}
     >
       <Container maxWidth="lg">
@@ -117,6 +161,7 @@ function Navbar() {
           }}
         >
           {/* ---------------- Logo ---------------- */}
+
           <Box
             component="a"
             href="/home"
@@ -126,7 +171,9 @@ function Navbar() {
               gap: 1.25,
               textDecoration: "none",
               transition: "transform 0.2s ease",
-              "&:hover": { transform: "translateY(-1px)" },
+              "&:hover": {
+                transform: "translateY(-1px)",
+              },
             }}
           >
             <Box
@@ -142,23 +189,33 @@ function Navbar() {
               }}
             >
               <AutoStoriesIcon
-                sx={{ color: "#fff", fontSize: { xs: 18, md: 20 } }}
+                sx={{
+                  color: "#fff",
+                  fontSize: { xs: 18, md: 20 },
+                }}
               />
             </Box>
 
-            <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.25 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "baseline",
+                gap: 0.25,
+              }}
+            >
               <Typography
                 component="span"
                 sx={{
                   fontWeight: 800,
                   fontSize: { xs: "1.2rem", md: "1.4rem" },
                   letterSpacing: "-0.6px",
-                  color: "#0f172a",
+                  color: "text.primary",
                   lineHeight: 1,
                 }}
               >
                 Learn
               </Typography>
+
               <Typography
                 component="span"
                 sx={{
@@ -178,6 +235,7 @@ function Navbar() {
           </Box>
 
           {/* ---------------- Desktop Navigation ---------------- */}
+
           <Box
             sx={{
               display: { xs: "none", md: "flex" },
@@ -195,7 +253,6 @@ function Navbar() {
 
             {user ? (
               user.role === "ADMIN" ? (
-                // ---- Admin (desktop) ----
                 <>
                   {adminItems.map((item) => (
                     <Button
@@ -214,11 +271,10 @@ function Navbar() {
                     sx={{
                       mx: 1,
                       my: 2,
-                      borderColor: "rgba(15, 23, 42, 0.08)",
+                      borderColor: "divider",
                     }}
                   />
 
-                  {/* Admin — click avatar to open dropdown */}
                   <Tooltip title={user.firstName || "User"} arrow>
                     <Box
                       onClick={handleMenuOpen}
@@ -227,7 +283,9 @@ function Navbar() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          handleMenuOpen(e as unknown as React.MouseEvent<HTMLElement>);
+                          handleMenuOpen(
+                            e as unknown as MouseEvent<HTMLElement>,
+                          );
                         }
                       }}
                       sx={{
@@ -237,18 +295,21 @@ function Navbar() {
                         background: brandGradient,
                         cursor: "pointer",
                         transition: "transform 0.2s ease",
-                        "&:hover": { transform: "scale(1.05)" },
+                        "&:hover": {
+                          transform: "scale(1.05)",
+                        },
                       }}
                     >
                       <Avatar
                         sx={{
                           width: 34,
                           height: 34,
-                          bgcolor: "#fff",
-                          color: "#4f46e5",
+                          bgcolor: "background.paper",
+                          color: "primary.main",
                           fontSize: "0.9rem",
                           fontWeight: 700,
-                          border: "2px solid #fff",
+                          border: "2px solid",
+                          borderColor: "background.paper",
                         }}
                       >
                         {userInitial}
@@ -257,7 +318,6 @@ function Navbar() {
                   </Tooltip>
                 </>
               ) : (
-                // ---- Normal user (desktop) — just the avatar ----
                 <Tooltip title={user.firstName || "User"} arrow>
                   <Box
                     onClick={handleMenuOpen}
@@ -266,9 +326,7 @@ function Navbar() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        handleMenuOpen(
-                          e as unknown as React.MouseEvent<HTMLElement>
-                        );
+                        handleMenuOpen(e as unknown as MouseEvent<HTMLElement>);
                       }
                     }}
                     sx={{
@@ -288,11 +346,12 @@ function Navbar() {
                       sx={{
                         width: 34,
                         height: 34,
-                        bgcolor: "#fff",
-                        color: "#4f46e5",
+                        bgcolor: "background.paper",
+                        color: "primary.main",
                         fontSize: "0.9rem",
                         fontWeight: 700,
-                        border: "2px solid #fff",
+                        border: "2px solid",
+                        borderColor: "background.paper",
                       }}
                     >
                       {userInitial}
@@ -328,9 +387,14 @@ function Navbar() {
                 Get Started
               </Button>
             )}
+
+            {/* Desktop theme toggle */}
+
+            {themeToggle}
           </Box>
 
-          {/* ---------------- Mobile right-side controls ---------------- */}
+          {/* ---------------- Mobile Controls ---------------- */}
+
           <Box
             sx={{
               display: { xs: "flex", md: "none" },
@@ -338,6 +402,10 @@ function Navbar() {
               gap: 0.5,
             }}
           >
+            {/* Mobile theme toggle */}
+
+            {themeToggle}
+
             {user && (
               <>
                 <Avatar
@@ -345,15 +413,15 @@ function Navbar() {
                   sx={{
                     width: 32,
                     height: 32,
-                    bgcolor: "#fff",
-                    color: "#4f46e5",
+                    bgcolor: "primary.main",
+                    color: "#fff",
                     fontSize: "0.85rem",
                     fontWeight: 700,
-                    border: "2px solid transparent",
-                    backgroundImage: brandGradient,
-                    backgroundOrigin: "border-box",
-                    backgroundClip: "padding-box, border-box",
                     cursor: "pointer",
+                    border: "2px solid",
+                    borderColor: "background.paper",
+                    outline: "2px solid",
+                    outlineColor: "primary.main",
                   }}
                 >
                   {userInitial}
@@ -363,10 +431,12 @@ function Navbar() {
                   onClick={handleDrawerToggle}
                   aria-label="open menu"
                   sx={{
-                    color: "#0f172a",
+                    color: "text.primary",
                     borderRadius: "10px",
                     p: 1,
-                    "&:hover": { backgroundColor: navHoverBg },
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
                   }}
                 >
                   <MenuIcon sx={{ fontSize: 22 }} />
@@ -400,24 +470,29 @@ function Navbar() {
       </Container>
 
       {/* ---------------- Mobile Drawer ---------------- */}
+
       <Drawer
         anchor="right"
         open={drawerOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
+        ModalProps={{
+          keepMounted: true,
+        }}
         slotProps={{
           paper: {
             sx: {
               width: 280,
-              backgroundColor: "rgba(255, 255, 255, 0.95)",
+              backgroundColor: "background.paper",
+              color: "text.primary",
+              borderLeft: 1,
+              borderColor: "divider",
               backdropFilter: "saturate(180%) blur(20px)",
-              WebkitBackdropFilter: "saturate(180%) blur(20px)",
-              borderLeft: "1px solid rgba(15, 23, 42, 0.06)",
             },
           },
         }}
       >
         {/* Drawer header */}
+
         <Box
           sx={{
             display: "flex",
@@ -425,10 +500,17 @@ function Navbar() {
             justifyContent: "space-between",
             px: 2.5,
             py: 2,
-            borderBottom: "1px solid rgba(15, 23, 42, 0.06)",
+            borderBottom: 1,
+            borderColor: "divider",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.25,
+            }}
+          >
             <Box
               sx={{
                 width: 34,
@@ -441,14 +523,20 @@ function Navbar() {
                   "0 6px 16px -6px rgba(99, 102, 241, 0.6), inset 0 1px 0 rgba(255,255,255,0.35)",
               }}
             >
-              <AutoStoriesIcon sx={{ color: "#fff", fontSize: 18 }} />
+              <AutoStoriesIcon
+                sx={{
+                  color: "#fff",
+                  fontSize: 18,
+                }}
+              />
             </Box>
+
             <Typography
               sx={{
                 fontWeight: 800,
                 fontSize: "1.1rem",
                 letterSpacing: "-0.5px",
-                color: "#0f172a",
+                color: "text.primary",
               }}
             >
               Learn
@@ -470,16 +558,20 @@ function Navbar() {
             onClick={handleDrawerToggle}
             aria-label="close menu"
             sx={{
-              color: "#64748b",
+              color: "text.secondary",
               borderRadius: "10px",
-              "&:hover": { backgroundColor: navHoverBg, color: navHoverColor },
+              "&:hover": {
+                backgroundColor: "action.hover",
+                color: "primary.main",
+              },
             }}
           >
             <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Box>
 
-        {/* Drawer items — no separate Profile/Logout, since these live in the avatar menu */}
+        {/* Drawer items */}
+
         <List sx={{ px: 1.5, py: 2 }}>
           <ListItemButton
             component="a"
@@ -488,12 +580,23 @@ function Navbar() {
             sx={drawerItemSx}
           >
             <ListItemIcon sx={{ minWidth: 36 }}>
-              <MenuBookIcon sx={{ fontSize: 20, color: "#6366f1" }} />
+              <MenuBookIcon
+                sx={{
+                  fontSize: 20,
+                  color: "primary.main",
+                }}
+              />
             </ListItemIcon>
+
             <ListItemText
               primary="Home"
               slotProps={{
-                primary: { sx: { fontWeight: 600, fontSize: "0.95rem" } },
+                primary: {
+                  sx: {
+                    fontWeight: 600,
+                    fontSize: "0.95rem",
+                  },
+                },
               }}
             />
           </ListItemButton>
@@ -508,18 +611,65 @@ function Navbar() {
                 sx={drawerItemSx}
               >
                 <ListItemIcon sx={{ minWidth: 36 }}>
-                  <Box sx={{ color: "#6366f1", display: "flex" }}>
+                  <Box
+                    sx={{
+                      color: "primary.main",
+                      display: "flex",
+                    }}
+                  >
                     {item.icon}
                   </Box>
                 </ListItemIcon>
+
                 <ListItemText
                   primary={item.label}
                   slotProps={{
-                    primary: { sx: { fontWeight: 600, fontSize: "0.95rem" } },
+                    primary: {
+                      sx: {
+                        fontWeight: 600,
+                        fontSize: "0.95rem",
+                      },
+                    },
                   }}
                 />
               </ListItemButton>
             ))}
+
+          {/* Theme toggle in drawer */}
+
+          <Divider sx={{ my: 1, borderColor: "divider" }} />
+
+          <ListItemButton onClick={toggleTheme} sx={drawerItemSx}>
+            <ListItemIcon sx={{ minWidth: 36 }}>
+              {isDark ? (
+                <LightModeIcon
+                  sx={{
+                    color: "primary.main",
+                    fontSize: 20,
+                  }}
+                />
+              ) : (
+                <DarkModeIcon
+                  sx={{
+                    color: "primary.main",
+                    fontSize: 20,
+                  }}
+                />
+              )}
+            </ListItemIcon>
+
+            <ListItemText
+              primary={isDark ? "Light Mode" : "Dark Mode"}
+              slotProps={{
+                primary: {
+                  sx: {
+                    fontWeight: 600,
+                    fontSize: "0.95rem",
+                  },
+                },
+              }}
+            />
+          </ListItemButton>
 
           {!user && (
             <Box sx={{ px: 1.5, mt: 2 }}>
@@ -547,34 +697,46 @@ function Navbar() {
         </List>
       </Drawer>
 
-      {/* ---------------- Avatar dropdown menu (desktop + mobile) ---------------- */}
+      {/* ---------------- Avatar dropdown menu ---------------- */}
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
         slotProps={{
           paper: {
             sx: {
               mt: 1,
               minWidth: 200,
               borderRadius: "14px",
-              border: "1px solid rgba(15, 23, 42, 0.06)",
-              boxShadow:
-                "0 12px 32px -12px rgba(99, 102, 241, 0.35), 0 4px 12px -6px rgba(139, 92, 246, 0.2)",
+              backgroundColor: "background.paper",
+              color: "text.primary",
+              border: 1,
+              borderColor: "divider",
+              boxShadow: isDark
+                ? "0 12px 32px rgba(0,0,0,0.35)"
+                : "0 12px 32px -12px rgba(99, 102, 241, 0.35), 0 4px 12px -6px rgba(139, 92, 246, 0.2)",
             },
           },
         }}
       >
-        {/* Header — name + email */}
+        {/* Header: name and email */}
+
         {user && (
           <Box sx={{ px: 2, py: 1.5 }}>
             <Typography
               sx={{
                 fontWeight: 700,
                 fontSize: "0.9rem",
-                color: "#0f172a",
+                color: "text.primary",
                 letterSpacing: "-0.2px",
                 lineHeight: 1.3,
               }}
@@ -582,10 +744,11 @@ function Navbar() {
               {[user.firstName, user.lastName].filter(Boolean).join(" ") ||
                 "User"}
             </Typography>
+
             <Typography
               sx={{
                 fontSize: "0.78rem",
-                color: "#94a3b8",
+                color: "text.secondary",
                 fontWeight: 500,
                 mt: 0.25,
                 wordBreak: "break-word",
@@ -596,9 +759,10 @@ function Navbar() {
           </Box>
         )}
 
-        <Divider sx={{ borderColor: "rgba(15, 23, 42, 0.06)" }} />
+        <Divider sx={{ borderColor: "divider" }} />
 
-        {/* Profile (hidden for admins since they don't have that page) */}
+        {/* Profile */}
+
         {user?.role !== "ADMIN" && (
           <MenuItem
             component="a"
@@ -607,50 +771,75 @@ function Navbar() {
             sx={{
               fontSize: "0.9rem",
               fontWeight: 600,
-              color: "#334155",
+              color: "text.primary",
               py: 1.2,
-              "&:hover": { backgroundColor: "rgba(99, 102, 241, 0.06)" },
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
             }}
           >
-            <PersonIcon sx={{ fontSize: 18, mr: 1.25, color: "#6366f1" }} />
+            <PersonIcon
+              sx={{
+                fontSize: 18,
+                mr: 1.25,
+                color: "primary.main",
+              }}
+            />
             Profile
           </MenuItem>
         )}
 
-        <MenuItem
-          onClick={() => {
-            handleMenuClose();
-            logout();
-          }}
-          sx={{
-            fontSize: "0.9rem",
-            fontWeight: 600,
-            color: "#e11d48",
-            py: 1.2,
-            "&:hover": { backgroundColor: "rgba(244, 63, 94, 0.06)" },
-          }}
-        >
-          <LogoutIcon sx={{ fontSize: 18, mr: 1.25, color: "#e11d48" }} />
-          Logout
-        </MenuItem>
+        {/* Logout */}
+
+        {user && (
+          <MenuItem
+            onClick={() => {
+              handleMenuClose();
+              logout();
+            }}
+            sx={{
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: "error.main",
+              py: 1.2,
+              "&:hover": {
+                backgroundColor: "action.hover",
+              },
+            }}
+          >
+            <LogoutIcon
+              sx={{
+                fontSize: 18,
+                mr: 1.25,
+                color: "error.main",
+              }}
+            />
+            Logout
+          </MenuItem>
+        )}
       </Menu>
     </AppBar>
   );
 }
 
-/* ---------------- Shared drawer item style ---------------- */
+// ---------------- Shared drawer item style ----------------
+
 const drawerItemSx = {
   borderRadius: "12px",
   mb: 0.5,
   px: 1.5,
   py: 1.2,
-  color: "#334155",
+  color: "text.primary",
   transition: "all 0.2s ease",
+
   "&:hover": {
-    backgroundColor: "rgba(99, 102, 241, 0.06)",
-    color: "#4f46e5",
+    backgroundColor: "action.hover",
+    color: "primary.main",
   },
-  "& .MuiListItemIcon-root": { color: "inherit" },
+
+  "& .MuiListItemIcon-root": {
+    color: "inherit",
+  },
 };
 
 export default Navbar;

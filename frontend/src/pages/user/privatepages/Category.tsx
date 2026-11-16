@@ -9,6 +9,7 @@ import {
   Grid,
   Typography,
   Chip,
+  useTheme,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -31,6 +32,20 @@ function Category() {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
+
+  const isDark = theme.palette.mode === "dark";
+
+  const brandGradient =
+    "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
+
+  const brandGradientSoft = isDark
+    ? "linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(139,92,246,0.18) 50%, rgba(236,72,153,0.16) 100%)"
+    : "linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.12) 50%, rgba(236,72,153,0.12) 100%)";
+
+  const cardHoverShadow = isDark
+    ? "0 20px 40px -20px rgba(99, 102, 241, 0.3), 0 8px 16px -8px rgba(0, 0, 0, 0.35)"
+    : "0 20px 40px -20px rgba(99, 102, 241, 0.35), 0 8px 16px -8px rgba(139, 92, 246, 0.2)";
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -56,28 +71,18 @@ function Category() {
     fetchTopics();
   }, [id]);
 
-  // ---- Design tokens (match Navbar + Home + Field + Auth) ----
-  const brandGradient =
-    "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
-  const brandGradientSoft =
-    "linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.12) 50%, rgba(236,72,153,0.12) 100%)";
-  const cardHoverShadow =
-    "0 20px 40px -20px rgba(99, 102, 241, 0.35), 0 8px 16px -8px rgba(139, 92, 246, 0.2)";
-
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.10), transparent 60%), " +
-          "radial-gradient(1000px 500px at 110% 0%, rgba(236,72,153,0.08), transparent 60%), " +
-          "#fafaff",
+        backgroundColor: theme.palette.background.default,
         pt: { xs: 5, md: 7 },
         pb: { xs: 8, md: 12 },
+        transition: "background-color 0.3s ease",
       }}
     >
       <Container maxWidth="lg">
-        {/* ---------------- Back to categories ---------------- */}
+        {/* Back to categories */}
         <Box
           component="button"
           onClick={() => navigate(-1)}
@@ -91,13 +96,15 @@ function Category() {
             px: 1.5,
             py: 0.75,
             borderRadius: "10px",
-            color: "#64748b",
+            color: theme.palette.text.secondary,
             fontSize: "0.85rem",
             fontWeight: 600,
             transition: "all 0.2s ease",
             "&:hover": {
-              color: "#4f46e5",
-              backgroundColor: "rgba(99, 102, 241, 0.08)",
+              color: theme.palette.primary.main,
+              backgroundColor: isDark
+                ? "rgba(129, 140, 248, 0.12)"
+                : "rgba(99, 102, 241, 0.08)",
             },
           }}
         >
@@ -105,14 +112,13 @@ function Category() {
           Back to categories
         </Box>
 
-        {/* ---------------- Hero / Header ---------------- */}
+        {/* Hero / Header */}
         <Box
           sx={{
             textAlign: "center",
             mb: { xs: 6, md: 8 },
           }}
         >
-          {/* Eyebrow chip */}
           <Chip
             icon={<ExploreIcon sx={{ fontSize: 16 }} />}
             label="Pick a topic to begin"
@@ -124,15 +130,22 @@ function Category() {
               fontWeight: 600,
               fontSize: "0.78rem",
               letterSpacing: "0.2px",
-              color: "#4f46e5",
-              backgroundColor: "rgba(99, 102, 241, 0.08)",
-              border: "1px solid rgba(99, 102, 241, 0.18)",
+              color: theme.palette.primary.main,
+              backgroundColor: isDark
+                ? "rgba(129, 140, 248, 0.12)"
+                : "rgba(99, 102, 241, 0.08)",
+              border: `1px solid ${
+                isDark
+                  ? "rgba(129, 140, 248, 0.25)"
+                  : "rgba(99, 102, 241, 0.18)"
+              }`,
               borderRadius: "999px",
-              "& .MuiChip-icon": { color: "#6366f1" },
+              "& .MuiChip-icon": {
+                color: theme.palette.primary.main,
+              },
             }}
           />
 
-          {/* Headline */}
           <Typography
             variant="h2"
             component="h1"
@@ -141,7 +154,7 @@ function Category() {
               letterSpacing: "-1.5px",
               lineHeight: 1.1,
               fontSize: { xs: "2.1rem", sm: "2.6rem", md: "3.1rem" },
-              color: "#0f172a",
+              color: theme.palette.text.primary,
               mb: 2,
             }}
           >
@@ -159,11 +172,10 @@ function Category() {
             </Box>
           </Typography>
 
-          {/* Subtitle */}
           <Typography
             variant="body1"
             sx={{
-              color: "#64748b",
+              color: theme.palette.text.secondary,
               maxWidth: 620,
               mx: "auto",
               fontSize: { xs: "1rem", md: "1.08rem" },
@@ -174,7 +186,7 @@ function Category() {
           </Typography>
         </Box>
 
-        {/* ---------------- Content ---------------- */}
+        {/* Content */}
         {loading ? (
           <Box
             sx={{
@@ -191,12 +203,13 @@ function Category() {
                 size={56}
                 thickness={4}
                 sx={{
-                  color: "#6366f1",
+                  color: theme.palette.primary.main,
                   "& .MuiCircularProgress-circle": {
                     strokeLinecap: "round",
                   },
                 }}
               />
+
               <Box
                 sx={{
                   position: "absolute",
@@ -205,19 +218,27 @@ function Category() {
                   placeItems: "center",
                 }}
               >
-                <AutoStoriesIcon sx={{ fontSize: 22, color: "#8b5cf6" }} />
+                <AutoStoriesIcon
+                  sx={{
+                    fontSize: 22,
+                    color: theme.palette.secondary.main,
+                  }}
+                />
               </Box>
             </Box>
 
             <Typography
               variant="body2"
-              sx={{ color: "#94a3b8", fontWeight: 500 }}
+              sx={{
+                color: theme.palette.text.secondary,
+                fontWeight: 500,
+              }}
             >
               Loading topics…
             </Typography>
           </Box>
         ) : topics.length === 0 ? (
-          /* ---------------- Empty state ---------------- */
+          /* Empty state */
           <Box
             sx={{
               textAlign: "center",
@@ -233,7 +254,7 @@ function Category() {
                 height: 72,
                 borderRadius: "20px",
                 background: brandGradientSoft,
-                color: "#8b5cf6",
+                color: theme.palette.secondary.main,
                 display: "grid",
                 placeItems: "center",
                 mx: "auto",
@@ -247,7 +268,7 @@ function Category() {
               variant="h6"
               sx={{
                 fontWeight: 700,
-                color: "#0f172a",
+                color: theme.palette.text.primary,
                 mb: 1,
                 letterSpacing: "-0.3px",
               }}
@@ -257,14 +278,17 @@ function Category() {
 
             <Typography
               variant="body2"
-              sx={{ color: "#64748b", lineHeight: 1.65 }}
+              sx={{
+                color: theme.palette.text.secondary,
+                lineHeight: 1.65,
+              }}
             >
               This category doesn&apos;t have any topics available right now.
               Check back soon or explore a different category.
             </Typography>
           </Box>
         ) : (
-          /* ---------------- Topics grid ---------------- */
+          /* Topics grid */
           <Grid container spacing={{ xs: 2.5, md: 3 }}>
             {topics.map((topic) => (
               <Grid key={topic.id} size={{ xs: 12, sm: 6, md: 4 }}>
@@ -273,8 +297,8 @@ function Category() {
                   sx={{
                     height: "100%",
                     borderRadius: "20px",
-                    background: "#ffffff",
-                    border: "1px solid rgba(15, 23, 42, 0.06)",
+                    backgroundColor: theme.palette.background.paper,
+                    border: `1px solid ${theme.palette.divider}`,
                     position: "relative",
                     overflow: "hidden",
                     transition:
@@ -291,7 +315,7 @@ function Category() {
                     },
                     "&:hover": {
                       transform: "translateY(-6px)",
-                      borderColor: "rgba(99, 102, 241, 0.25)",
+                      borderColor: theme.palette.primary.main,
                       boxShadow: cardHoverShadow,
                       "& .topic-icon-wrap": {
                         background: brandGradient,
@@ -335,7 +359,7 @@ function Category() {
                           display: "grid",
                           placeItems: "center",
                           background: brandGradientSoft,
-                          color: "#6366f1",
+                          color: theme.palette.primary.main,
                           transition:
                             "background 0.28s ease, color 0.28s ease, transform 0.28s ease",
                         }}
@@ -351,7 +375,7 @@ function Category() {
                           fontWeight: 700,
                           fontSize: "1.15rem",
                           letterSpacing: "-0.3px",
-                          color: "#0f172a",
+                          color: theme.palette.text.primary,
                           lineHeight: 1.35,
                         }}
                       >
@@ -362,7 +386,7 @@ function Category() {
                       <Typography
                         variant="body2"
                         sx={{
-                          color: "#64748b",
+                          color: theme.palette.text.secondary,
                           lineHeight: 1.65,
                           flexGrow: 1,
                           display: "-webkit-box",
@@ -381,7 +405,7 @@ function Category() {
                           display: "flex",
                           alignItems: "center",
                           gap: 0.75,
-                          color: "#4f46e5",
+                          color: theme.palette.primary.main,
                           fontWeight: 700,
                           fontSize: "0.85rem",
                           letterSpacing: "-0.1px",

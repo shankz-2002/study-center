@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import type { Level } from "../../../types/Level";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,7 +11,9 @@ import {
   Typography,
   Chip,
   Divider,
+  useTheme,
 } from "@mui/material";
+
 import LearningContent from "../../../components/user/LearningContent";
 import Questions from "../../../components/user/Questions";
 
@@ -19,6 +22,7 @@ import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
+
 import LevelSideBar from "../../../components/user/LevelSideBar";
 import type { UserTopicCompletion } from "../../../types/Topic";
 import TopicCompletion from "../../../components/user/TopicCompletion";
@@ -28,20 +32,51 @@ function Topic() {
   const [loading, setLoading] = useState(false);
   const [levels, setLevels] = useState<Level[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
+
   const { id } = useParams();
   const navigate = useNavigate();
+  const theme = useTheme();
+
+  const isDark = theme.palette.mode === "dark";
+
   const [topicCompletion, setTopicCompletion] =
     useState<UserTopicCompletion | null>(null);
+
+  const brandGradient =
+    "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
+
+  const brandGradientSoft = isDark
+    ? "linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(139,92,246,0.18) 50%, rgba(236,72,153,0.16) 100%)"
+    : "linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.12) 50%, rgba(236,72,153,0.12) 100%)";
+
+  const pageBackground = isDark
+    ? `radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.16), transparent 60%),
+       radial-gradient(1000px 500px at 110% 0%, rgba(236,72,153,0.12), transparent 60%),
+       ${theme.palette.background.default}`
+    : `radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.10), transparent 60%),
+       radial-gradient(1000px 500px at 110% 0%, rgba(236,72,153,0.08), transparent 60%),
+       ${theme.palette.background.default}`;
+
+  const glassBackground = isDark
+    ? "rgba(30, 30, 46, 0.88)"
+    : "rgba(255, 255, 255, 0.85)";
+
+  const glassShadow = isDark
+    ? "0 20px 40px -30px rgba(0, 0, 0, 0.6), 0 8px 20px -12px rgba(99, 102, 241, 0.2)"
+    : "0 20px 40px -30px rgba(99, 102, 241, 0.35), 0 8px 20px -12px rgba(139, 92, 246, 0.15)";
 
   useEffect(() => {
     const fetchLevels = async () => {
       try {
         setLoading(true);
+
         const response = await getLevels(id!);
+
         if (response.data.success) {
           const fetchedLevels = response.data.levels;
 
           setLevels(fetchedLevels);
+
           if (fetchedLevels.length > 0) {
             setSelectedLevel(fetchedLevels[0]);
           }
@@ -53,6 +88,7 @@ function Topic() {
         setLoading(false);
       }
     };
+
     fetchLevels();
   }, [id]);
 
@@ -89,14 +125,35 @@ function Topic() {
     }
   };
 
-  const brandGradient =
-    "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
-  const brandGradientSoft =
-    "linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.12) 50%, rgba(236,72,153,0.12) 100%)";
-  const pageBackground =
-    "radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.10), transparent 60%), " +
-    "radial-gradient(1000px 500px at 110% 0%, rgba(236,72,153,0.08), transparent 60%), " +
-    "#fafaff";
+  const backButton = (
+    <Box
+      component="button"
+      onClick={() => navigate(-1)}
+      sx={{
+        all: "unset",
+        cursor: "pointer",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 0.75,
+        px: 1.5,
+        py: 0.75,
+        borderRadius: "10px",
+        color: theme.palette.text.secondary,
+        fontSize: "0.85rem",
+        fontWeight: 600,
+        transition: "all 0.2s ease",
+        "&:hover": {
+          color: theme.palette.primary.main,
+          backgroundColor: isDark
+            ? "rgba(129, 140, 248, 0.12)"
+            : "rgba(99, 102, 241, 0.08)",
+        },
+      }}
+    >
+      <ArrowBackIcon sx={{ fontSize: 18 }} />
+      Back to topics
+    </Box>
+  );
 
   /* ---------------- Loading ---------------- */
   if (loading) {
@@ -117,10 +174,13 @@ function Topic() {
             size={56}
             thickness={4}
             sx={{
-              color: "#6366f1",
-              "& .MuiCircularProgress-circle": { strokeLinecap: "round" },
+              color: theme.palette.primary.main,
+              "& .MuiCircularProgress-circle": {
+                strokeLinecap: "round",
+              },
             }}
           />
+
           <Box
             sx={{
               position: "absolute",
@@ -129,11 +189,22 @@ function Topic() {
               placeItems: "center",
             }}
           >
-            <AutoStoriesIcon sx={{ fontSize: 22, color: "#8b5cf6" }} />
+            <AutoStoriesIcon
+              sx={{
+                fontSize: 22,
+                color: theme.palette.secondary.main,
+              }}
+            />
           </Box>
         </Box>
 
-        <Typography variant="body2" sx={{ color: "#94a3b8", fontWeight: 500 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+          }}
+        >
           Loading levels…
         </Typography>
       </Box>
@@ -151,36 +222,10 @@ function Topic() {
           pb: { xs: 8, md: 10 },
         }}
       >
-        {/* Back link */}
         <Box sx={{ px: { xs: 2, md: 4 }, mb: 2 }}>
-          <Box
-            component="button"
-            onClick={() => navigate(-1)}
-            sx={{
-              all: "unset",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 0.75,
-              px: 1.5,
-              py: 0.75,
-              borderRadius: "10px",
-              color: "#64748b",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              transition: "all 0.2s ease",
-              "&:hover": {
-                color: "#4f46e5",
-                backgroundColor: "rgba(99, 102, 241, 0.08)",
-              },
-            }}
-          >
-            <ArrowBackIcon sx={{ fontSize: 18 }} />
-            Back to topics
-          </Box>
+          {backButton}
         </Box>
 
-        {/* Centered empty state */}
         <Box
           sx={{
             minHeight: "calc(100vh - 200px)",
@@ -197,7 +242,7 @@ function Topic() {
                 height: 72,
                 borderRadius: "20px",
                 background: brandGradientSoft,
-                color: "#8b5cf6",
+                color: theme.palette.secondary.main,
                 display: "grid",
                 placeItems: "center",
                 mx: "auto",
@@ -211,7 +256,7 @@ function Topic() {
               variant="h6"
               sx={{
                 fontWeight: 700,
-                color: "#0f172a",
+                color: theme.palette.text.primary,
                 mb: 1,
                 letterSpacing: "-0.3px",
               }}
@@ -221,7 +266,10 @@ function Topic() {
 
             <Typography
               variant="body2"
-              sx={{ color: "#64748b", lineHeight: 1.65 }}
+              sx={{
+                color: theme.palette.text.secondary,
+                lineHeight: 1.65,
+              }}
             >
               This topic doesn&apos;t have any materials available right now.
               Check back soon or explore a different topic.
@@ -240,38 +288,15 @@ function Topic() {
         background: pageBackground,
         pt: { xs: 3, md: 5 },
         pb: { xs: 8, md: 10 },
+        transition: "background 0.3s ease",
       }}
     >
       {/* Back link */}
       <Box sx={{ px: { xs: 2, md: 4 }, mb: 2 }}>
-        <Box
-          component="button"
-          onClick={() => navigate(-1)}
-          sx={{
-            all: "unset",
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 0.75,
-            px: 1.5,
-            py: 0.75,
-            borderRadius: "10px",
-            color: "#64748b",
-            fontSize: "0.85rem",
-            fontWeight: 600,
-            transition: "all 0.2s ease",
-            "&:hover": {
-              color: "#4f46e5",
-              backgroundColor: "rgba(99, 102, 241, 0.08)",
-            },
-          }}
-        >
-          <ArrowBackIcon sx={{ fontSize: 18 }} />
-          Back to topics
-        </Box>
+        {backButton}
       </Box>
 
-      {/* ---------------- Two-column layout ---------------- */}
+      {/* Two-column layout */}
       <Box
         sx={{
           display: "flex",
@@ -282,7 +307,7 @@ function Topic() {
           width: "100%",
         }}
       >
-        {/* ------------- Level Sidebar (frosted card) ------------- */}
+        {/* Level Sidebar */}
         <Box
           sx={{
             width: { xs: "100%", md: 300 },
@@ -291,12 +316,11 @@ function Topic() {
             top: { md: 100 },
             alignSelf: "flex-start",
             borderRadius: "20px",
-            background: "rgba(255, 255, 255, 0.85)",
+            background: glassBackground,
             backdropFilter: "saturate(180%) blur(20px)",
             WebkitBackdropFilter: "saturate(180%) blur(20px)",
-            border: "1px solid rgba(15, 23, 42, 0.06)",
-            boxShadow:
-              "0 20px 40px -30px rgba(99, 102, 241, 0.35), 0 8px 20px -12px rgba(139, 92, 246, 0.15)",
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: glassShadow,
             overflow: "hidden",
             "&::before": {
               content: '""',
@@ -306,6 +330,7 @@ function Topic() {
               right: 0,
               height: "4px",
               background: brandGradient,
+              zIndex: 1,
             },
           }}
         >
@@ -316,11 +341,11 @@ function Topic() {
           />
         </Box>
 
-        {/* ------------- Main content ------------- */}
+        {/* Main content */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {selectedLevel ? (
             <>
-              {/* ---------------- Level header (no card) ---------------- */}
+              {/* Level header */}
               <Box sx={{ mb: 4 }}>
                 <Chip
                   icon={<LayersOutlinedIcon sx={{ fontSize: 16 }} />}
@@ -333,11 +358,19 @@ function Topic() {
                     fontWeight: 600,
                     fontSize: "0.78rem",
                     letterSpacing: "0.2px",
-                    color: "#4f46e5",
-                    backgroundColor: "rgba(99, 102, 241, 0.08)",
-                    border: "1px solid rgba(99, 102, 241, 0.18)",
+                    color: theme.palette.primary.main,
+                    backgroundColor: isDark
+                      ? "rgba(129, 140, 248, 0.12)"
+                      : "rgba(99, 102, 241, 0.08)",
+                    border: `1px solid ${
+                      isDark
+                        ? "rgba(129, 140, 248, 0.25)"
+                        : "rgba(99, 102, 241, 0.18)"
+                    }`,
                     borderRadius: "999px",
-                    "& .MuiChip-icon": { color: "#6366f1" },
+                    "& .MuiChip-icon": {
+                      color: theme.palette.primary.main,
+                    },
                   }}
                 />
 
@@ -359,8 +392,9 @@ function Topic() {
                       placeItems: "center",
                       color: "#fff",
                       flexShrink: 0,
-                      boxShadow:
-                        "0 10px 20px -8px rgba(99, 102, 241, 0.6), inset 0 1px 0 rgba(255,255,255,0.35)",
+                      boxShadow: isDark
+                        ? "0 10px 20px -8px rgba(99, 102, 241, 0.4)"
+                        : "0 10px 20px -8px rgba(99, 102, 241, 0.6)",
                     }}
                   >
                     <MenuBookOutlinedIcon sx={{ fontSize: 24 }} />
@@ -373,7 +407,7 @@ function Topic() {
                       fontWeight: 800,
                       letterSpacing: "-1px",
                       fontSize: { xs: "1.7rem", md: "2.1rem" },
-                      color: "#0f172a",
+                      color: theme.palette.text.primary,
                       lineHeight: 1.15,
                     }}
                   >
@@ -384,7 +418,7 @@ function Topic() {
                 <Typography
                   variant="body1"
                   sx={{
-                    color: "#64748b",
+                    color: theme.palette.text.secondary,
                     lineHeight: 1.7,
                     fontSize: { xs: "0.95rem", md: "1rem" },
                     maxWidth: 780,
@@ -397,11 +431,11 @@ function Topic() {
               {/* Learning content */}
               <LearningContent levelId={selectedLevel.id} />
 
-              {/* Divider between learning content and practice questions */}
+              {/* Divider */}
               <Divider
                 sx={{
                   my: { xs: 5, md: 6 },
-                  borderColor: "rgba(15, 23, 42, 0.08)",
+                  borderColor: theme.palette.divider,
                 }}
               />
 
@@ -413,6 +447,7 @@ function Topic() {
                 onTopicCompleted={setTopicCompletion}
                 onLevelCompleted={refreshLevels}
               />
+
               {topicCompletion && (
                 <TopicCompletion completion={topicCompletion} />
               )}
@@ -421,13 +456,15 @@ function Topic() {
             <Box
               sx={{
                 borderRadius: "20px",
-                background: "rgba(255, 255, 255, 0.85)",
-                border: "1px solid rgba(15, 23, 42, 0.06)",
+                background: glassBackground,
+                border: `1px solid ${theme.palette.divider}`,
                 p: 4,
                 textAlign: "center",
               }}
             >
-              <Typography color="text.secondary">No level selected.</Typography>
+              <Typography color="text.secondary">
+                No level selected.
+              </Typography>
             </Box>
           )}
         </Box>

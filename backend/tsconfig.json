@@ -44,6 +44,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-    "exclude": ["node_modules", "dist", "neon.ts"]
+    "exclude": ["node_modules", "dist", "neon.ts","seed.ts","seed"]
 
 }

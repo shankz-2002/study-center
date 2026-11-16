@@ -1,3 +1,4 @@
+
 import {
   Box,
   Button,
@@ -6,6 +7,7 @@ import {
   InputAdornment,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import { forgotPassword } from "../../../services/auth";
@@ -18,6 +20,9 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function ForgottenPassword() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +33,9 @@ function ForgottenPassword() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
+
       const response = await forgotPassword(email);
+
       if (response.data.success) {
         toast.success("Reset link sent to your email");
         setEmail("");
@@ -41,29 +48,50 @@ function ForgottenPassword() {
     }
   };
 
-  // ---- Design tokens ----
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
 
+  // Theme-aware input styling
   const inputSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "14px",
-      backgroundColor: "rgba(255, 255, 255, 0.75)",
+      backgroundColor: theme.palette.background.default,
       transition: "box-shadow 0.2s ease, background-color 0.2s ease",
-      "& fieldset": { borderColor: "rgba(15, 23, 42, 0.10)" },
-      "&:hover fieldset": { borderColor: "rgba(99, 102, 241, 0.35)" },
-      "&.Mui-focused": { boxShadow: "0 0 0 4px rgba(99, 102, 241, 0.14)" },
+
+      "& fieldset": {
+        borderColor: theme.palette.divider,
+      },
+
+      "&:hover fieldset": {
+        borderColor: theme.palette.primary.main,
+      },
+
+      "&.Mui-focused": {
+        boxShadow: isDark
+          ? "0 0 0 4px rgba(129, 140, 248, 0.16)"
+          : "0 0 0 4px rgba(99, 102, 241, 0.14)",
+      },
+
       "&.Mui-focused fieldset": {
-        borderColor: "#6366f1",
+        borderColor: theme.palette.primary.main,
         borderWidth: "1.5px",
       },
     },
+
     "& .MuiInputLabel-root": {
-      color: "#64748b",
+      color: theme.palette.text.secondary,
       fontWeight: 500,
-      "&.Mui-focused": { color: "#4f46e5", fontWeight: 600 },
+
+      "&.Mui-focused": {
+        color: theme.palette.primary.main,
+        fontWeight: 600,
+      },
     },
-    "& .MuiInputBase-input": { fontWeight: 500, color: "#0f172a" },
+
+    "& .MuiInputBase-input": {
+      fontWeight: 500,
+      color: theme.palette.text.primary,
+    },
   };
 
   return (
@@ -74,10 +102,14 @@ function ForgottenPassword() {
         alignItems: "center",
         justifyContent: "center",
         py: { xs: 6, md: 8 },
-        background:
-          "radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%), " +
-          "radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%), " +
-          "#fafaff",
+
+        background: isDark
+          ? `radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.16), transparent 60%),
+             radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%),
+             ${theme.palette.background.default}`
+          : `radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%),
+             radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%),
+             ${theme.palette.background.default}`,
       }}
     >
       <Container maxWidth="sm">
@@ -87,14 +119,20 @@ function ForgottenPassword() {
             maxWidth: 460,
             mx: "auto",
             borderRadius: "24px",
-            background: "rgba(255, 255, 255, 0.85)",
+
+            backgroundColor: theme.palette.background.paper,
             backdropFilter: "saturate(180%) blur(20px)",
             WebkitBackdropFilter: "saturate(180%) blur(20px)",
-            border: "1px solid rgba(15, 23, 42, 0.06)",
-            boxShadow:
-              "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
+
+            border: `1px solid ${theme.palette.divider}`,
+
+            boxShadow: isDark
+              ? "0 30px 60px -30px rgba(0, 0, 0, 0.55), 0 10px 24px -12px rgba(99, 102, 241, 0.20)"
+              : "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
+
             overflow: "hidden",
             p: { xs: 3.5, sm: 4.5 },
+
             "&::before": {
               content: '""',
               position: "absolute",
@@ -106,7 +144,7 @@ function ForgottenPassword() {
             },
           }}
         >
-          {/* Brand mark + heading */}
+          {/* Brand mark and heading */}
           <Box sx={{ textAlign: "center", mb: 4 }}>
             <Box
               sx={{
@@ -122,7 +160,9 @@ function ForgottenPassword() {
                   "0 12px 24px -10px rgba(99, 102, 241, 0.65), inset 0 1px 0 rgba(255,255,255,0.35)",
               }}
             >
-              <LockResetOutlinedIcon sx={{ color: "#fff", fontSize: 28 }} />
+              <LockResetOutlinedIcon
+                sx={{ color: "#fff", fontSize: 28 }}
+              />
             </Box>
 
             <Typography
@@ -131,7 +171,7 @@ function ForgottenPassword() {
               sx={{
                 fontWeight: 800,
                 letterSpacing: "-0.8px",
-                color: "#0f172a",
+                color: "text.primary",
                 mb: 0.75,
                 fontSize: { xs: "1.6rem", sm: "1.85rem" },
               }}
@@ -141,7 +181,11 @@ function ForgottenPassword() {
 
             <Typography
               variant="body2"
-              sx={{ color: "#64748b", fontWeight: 500, fontSize: "0.92rem" }}
+              sx={{
+                color: "text.secondary",
+                fontWeight: 500,
+                fontSize: "0.92rem",
+              }}
             >
               Enter your email and we&apos;ll send you a link to reset it
             </Typography>
@@ -154,7 +198,11 @@ function ForgottenPassword() {
               e.preventDefault();
               handleSubmit();
             }}
-            sx={{ display: "flex", flexDirection: "column", gap: 2.25 }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2.25,
+            }}
           >
             <TextField
               label="Email"
@@ -171,7 +219,10 @@ function ForgottenPassword() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <AlternateEmailOutlinedIcon
-                        sx={{ fontSize: 20, color: "#94a3b8" }}
+                        sx={{
+                          fontSize: 20,
+                          color: "text.secondary",
+                        }}
                       />
                     </InputAdornment>
                   ),
@@ -198,22 +249,33 @@ function ForgottenPassword() {
                 background: brandGradient,
                 backgroundSize: "200% 200%",
                 color: "#fff",
+
                 boxShadow:
                   "0 12px 24px -10px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
+
                 transition: "all 0.3s ease",
+
                 "&:hover": {
                   backgroundPosition: "100% 50%",
                   boxShadow:
                     "0 16px 32px -10px rgba(139, 92, 246, 0.85), inset 0 1px 0 rgba(255,255,255,0.3)",
                   transform: "translateY(-1px)",
                 },
+
                 "&:disabled": {
-                  background:
-                    "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
+                  background: isDark
+                    ? "linear-gradient(135deg, #373b68 0%, #51436f 100%)"
+                    : "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
                   color: "#fff",
                 },
-                "& .MuiButton-endIcon": { transition: "transform 0.25s ease" },
-                "&:hover .MuiButton-endIcon": { transform: "translateX(3px)" },
+
+                "& .MuiButton-endIcon": {
+                  transition: "transform 0.25s ease",
+                },
+
+                "&:hover .MuiButton-endIcon": {
+                  transform: "translateX(3px)",
+                },
               }}
             >
               {loading ? (
@@ -233,12 +295,15 @@ function ForgottenPassword() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 0.75,
-                color: "#4f46e5",
+                color: "primary.main",
                 fontSize: "0.88rem",
                 fontWeight: 600,
                 textDecoration: "none",
                 transition: "color 0.2s ease",
-                "&:hover": { color: "#8b5cf6" },
+
+                "&:hover": {
+                  color: "secondary.main",
+                },
               }}
             >
               <ArrowBackIcon sx={{ fontSize: 16 }} />

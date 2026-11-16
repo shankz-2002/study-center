@@ -9,6 +9,7 @@ import {
   TextField,
   Typography,
   Divider,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import { registerApi } from "../../../services/auth";
@@ -26,6 +27,9 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 function Register() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -33,6 +37,7 @@ function Register() {
     password: "",
     confirmPassword: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -41,8 +46,10 @@ function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
       setLoading(true);
+
       if (form.password !== form.confirmPassword) {
         toast.error("Passwords do not match");
       } else {
@@ -71,49 +78,59 @@ function Register() {
     });
   };
 
-  // ---- Design tokens (match Navbar + Home + Login) ----
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
 
-  // Shared input styling — soft, rounded, indigo focus
+  // Theme-aware input styling
   const inputSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "14px",
-      backgroundColor: "rgba(255, 255, 255, 0.75)",
+      backgroundColor: theme.palette.background.default,
       transition: "box-shadow 0.2s ease, background-color 0.2s ease",
+
       "& fieldset": {
-        borderColor: "rgba(15, 23, 42, 0.10)",
+        borderColor: theme.palette.divider,
       },
+
       "&:hover fieldset": {
-        borderColor: "rgba(99, 102, 241, 0.35)",
+        borderColor: theme.palette.primary.main,
       },
+
       "&.Mui-focused": {
-        boxShadow: "0 0 0 4px rgba(99, 102, 241, 0.14)",
+        boxShadow: isDark
+          ? "0 0 0 4px rgba(129, 140, 248, 0.16)"
+          : "0 0 0 4px rgba(99, 102, 241, 0.14)",
       },
+
       "&.Mui-focused fieldset": {
-        borderColor: "#6366f1",
+        borderColor: theme.palette.primary.main,
         borderWidth: "1.5px",
       },
     },
+
     "& .MuiInputLabel-root": {
-      color: "#64748b",
+      color: theme.palette.text.secondary,
       fontWeight: 500,
+
       "&.Mui-focused": {
-        color: "#4f46e5",
+        color: theme.palette.primary.main,
         fontWeight: 600,
       },
     },
+
     "& .MuiInputBase-input": {
       fontWeight: 500,
-      color: "#0f172a",
+      color: theme.palette.text.primary,
     },
   };
 
-  // Live password match indicator
   const passwordsMatch =
-    form.confirmPassword.length > 0 && form.password === form.confirmPassword;
+    form.confirmPassword.length > 0 &&
+    form.password === form.confirmPassword;
+
   const passwordsMismatch =
-    form.confirmPassword.length > 0 && form.password !== form.confirmPassword;
+    form.confirmPassword.length > 0 &&
+    form.password !== form.confirmPassword;
 
   return (
     <Box
@@ -123,30 +140,38 @@ function Register() {
         alignItems: "center",
         justifyContent: "center",
         py: { xs: 6, md: 8 },
-        // Matches the ambient gradient backdrop of Home / Login
-        background:
-          "radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%), " +
-          "radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%), " +
-          "#fafaff",
+
+        background: isDark
+          ? `radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.16), transparent 60%),
+             radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%),
+             ${theme.palette.background.default}`
+          : `radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%),
+             radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%),
+             ${theme.palette.background.default}`,
       }}
     >
       <Container maxWidth="sm">
-        {/* ---------------- Card ---------------- */}
+        {/* Card */}
         <Box
           sx={{
             position: "relative",
             maxWidth: 500,
             mx: "auto",
             borderRadius: "24px",
-            background: "rgba(255, 255, 255, 0.85)",
+
+            backgroundColor: theme.palette.background.paper,
             backdropFilter: "saturate(180%) blur(20px)",
             WebkitBackdropFilter: "saturate(180%) blur(20px)",
-            border: "1px solid rgba(15, 23, 42, 0.06)",
-            boxShadow:
-              "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
+
+            border: `1px solid ${theme.palette.divider}`,
+
+            boxShadow: isDark
+              ? "0 30px 60px -30px rgba(0, 0, 0, 0.55), 0 10px 24px -12px rgba(99, 102, 241, 0.20)"
+              : "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
+
             overflow: "hidden",
             p: { xs: 3.5, sm: 4.5 },
-            // Top gradient accent line
+
             "&::before": {
               content: '""',
               position: "absolute",
@@ -158,7 +183,7 @@ function Register() {
             },
           }}
         >
-          {/* ---------------- Brand mark + heading ---------------- */}
+          {/* Brand mark and heading */}
           <Box sx={{ textAlign: "center", mb: 4 }}>
             <Box
               sx={{
@@ -183,7 +208,7 @@ function Register() {
               sx={{
                 fontWeight: 800,
                 letterSpacing: "-0.8px",
-                color: "#0f172a",
+                color: "text.primary",
                 mb: 0.75,
                 fontSize: { xs: "1.6rem", sm: "1.85rem" },
               }}
@@ -194,7 +219,7 @@ function Register() {
             <Typography
               variant="body2"
               sx={{
-                color: "#64748b",
+                color: "text.secondary",
                 fontWeight: 500,
                 fontSize: "0.92rem",
               }}
@@ -203,7 +228,7 @@ function Register() {
             </Typography>
           </Box>
 
-          {/* ---------------- Form ---------------- */}
+          {/* Form */}
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -213,7 +238,7 @@ function Register() {
               gap: 2.25,
             }}
           >
-            {/* First + Last name row */}
+            {/* First and Last name */}
             <Box
               sx={{
                 display: "flex",
@@ -235,7 +260,10 @@ function Register() {
                     startAdornment: (
                       <InputAdornment position="start">
                         <PersonOutlineOutlinedIcon
-                          sx={{ fontSize: 20, color: "#94a3b8" }}
+                          sx={{
+                            fontSize: 20,
+                            color: "text.secondary",
+                          }}
                         />
                       </InputAdornment>
                     ),
@@ -257,7 +285,10 @@ function Register() {
                     startAdornment: (
                       <InputAdornment position="start">
                         <PersonOutlineOutlinedIcon
-                          sx={{ fontSize: 20, color: "#94a3b8" }}
+                          sx={{
+                            fontSize: 20,
+                            color: "text.secondary",
+                          }}
                         />
                       </InputAdornment>
                     ),
@@ -282,7 +313,10 @@ function Register() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <AlternateEmailOutlinedIcon
-                        sx={{ fontSize: 20, color: "#94a3b8" }}
+                        sx={{
+                          fontSize: 20,
+                          color: "text.secondary",
+                        }}
                       />
                     </InputAdornment>
                   ),
@@ -306,10 +340,14 @@ function Register() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <LockOutlinedIcon
-                        sx={{ fontSize: 20, color: "#94a3b8" }}
+                        sx={{
+                          fontSize: 20,
+                          color: "text.secondary",
+                        }}
                       />
                     </InputAdornment>
                   ),
+
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
@@ -317,8 +355,10 @@ function Register() {
                         edge="end"
                         size="small"
                         sx={{
-                          color: "#94a3b8",
-                          "&:hover": { color: "#4f46e5" },
+                          color: "text.secondary",
+                          "&:hover": {
+                            color: "primary.main",
+                          },
                         }}
                         aria-label={
                           showPassword ? "Hide password" : "Show password"
@@ -353,10 +393,14 @@ function Register() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <LockOutlinedIcon
-                        sx={{ fontSize: 20, color: "#94a3b8" }}
+                        sx={{
+                          fontSize: 20,
+                          color: "text.secondary",
+                        }}
                       />
                     </InputAdornment>
                   ),
+
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
@@ -364,8 +408,10 @@ function Register() {
                         edge="end"
                         size="small"
                         sx={{
-                          color: "#94a3b8",
-                          "&:hover": { color: "#4f46e5" },
+                          color: "text.secondary",
+                          "&:hover": {
+                            color: "primary.main",
+                          },
                         }}
                         aria-label={
                           showConfirm
@@ -393,7 +439,7 @@ function Register() {
                   alignItems: "center",
                   gap: 0.75,
                   mt: -1,
-                  color: "#059669",
+                  color: "success.main",
                   fontSize: "0.82rem",
                   fontWeight: 600,
                 }}
@@ -409,7 +455,7 @@ function Register() {
                   mt: -1,
                   fontSize: "0.82rem",
                   fontWeight: 600,
-                  color: "#e11d48",
+                  color: "error.main",
                 }}
               >
                 Passwords do not match
@@ -436,23 +482,30 @@ function Register() {
                 background: brandGradient,
                 backgroundSize: "200% 200%",
                 color: "#fff",
+
                 boxShadow:
                   "0 12px 24px -10px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
+
                 transition: "all 0.3s ease",
+
                 "&:hover": {
                   backgroundPosition: "100% 50%",
                   boxShadow:
                     "0 16px 32px -10px rgba(139, 92, 246, 0.85), inset 0 1px 0 rgba(255,255,255,0.3)",
                   transform: "translateY(-1px)",
                 },
+
                 "&:disabled": {
-                  background:
-                    "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
+                  background: isDark
+                    ? "linear-gradient(135deg, #373b68 0%, #51436f 100%)"
+                    : "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
                   color: "#fff",
                 },
+
                 "& .MuiButton-endIcon": {
                   transition: "transform 0.25s ease",
                 },
+
                 "&:hover .MuiButton-endIcon": {
                   transform: "translateX(3px)",
                 },
@@ -469,11 +522,12 @@ function Register() {
             <Divider
               sx={{
                 my: 1,
-                color: "#94a3b8",
+                color: "text.secondary",
                 fontSize: "0.78rem",
                 fontWeight: 500,
+
                 "&::before, &::after": {
-                  borderColor: "rgba(15, 23, 42, 0.08)",
+                  borderColor: "divider",
                 },
               }}
             >
@@ -485,7 +539,7 @@ function Register() {
               variant="body2"
               sx={{
                 textAlign: "center",
-                color: "#64748b",
+                color: "text.secondary",
                 fontSize: "0.9rem",
               }}
             >
@@ -495,11 +549,12 @@ function Register() {
                 href="/login"
                 sx={{
                   fontWeight: 700,
-                  color: "#4f46e5",
+                  color: "primary.main",
                   textDecoration: "none",
                   transition: "color 0.2s ease",
+
                   "&:hover": {
-                    color: "#8b5cf6",
+                    color: "secondary.main",
                     textDecoration: "underline",
                   },
                 }}

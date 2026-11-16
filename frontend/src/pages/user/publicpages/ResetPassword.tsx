@@ -1,3 +1,4 @@
+
 import {
   Box,
   Button,
@@ -7,6 +8,7 @@ import {
   InputAdornment,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import type { ApiError } from "../../../types/Error";
@@ -23,15 +25,20 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function ResetPassword() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   const [form, setForm] = useState({
     password: "",
     confirm: "",
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { token } = useParams();
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
@@ -43,7 +50,6 @@ function ResetPassword() {
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
-    // Guard: don't call the API if passwords don't match
     if (form.password !== form.confirm) {
       toast.error("Passwords do not match");
       return;
@@ -54,9 +60,16 @@ function ResetPassword() {
       return;
     }
 
+    if (!token) {
+      toast.error("Invalid or missing reset token");
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await resetPassword(form.password, token!);
+
+      const response = await resetPassword(form.password, token);
+
       if (response.data.success) {
         toast.success("Password changed successfully");
         navigate("/login");
@@ -69,34 +82,55 @@ function ResetPassword() {
     }
   };
 
-  // ---- Design tokens ----
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
 
+  // Theme-aware input styling
   const inputSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "14px",
-      backgroundColor: "rgba(255, 255, 255, 0.75)",
+      backgroundColor: theme.palette.background.default,
       transition: "box-shadow 0.2s ease, background-color 0.2s ease",
-      "& fieldset": { borderColor: "rgba(15, 23, 42, 0.10)" },
-      "&:hover fieldset": { borderColor: "rgba(99, 102, 241, 0.35)" },
-      "&.Mui-focused": { boxShadow: "0 0 0 4px rgba(99, 102, 241, 0.14)" },
+
+      "& fieldset": {
+        borderColor: theme.palette.divider,
+      },
+
+      "&:hover fieldset": {
+        borderColor: theme.palette.primary.main,
+      },
+
+      "&.Mui-focused": {
+        boxShadow: isDark
+          ? "0 0 0 4px rgba(129, 140, 248, 0.16)"
+          : "0 0 0 4px rgba(99, 102, 241, 0.14)",
+      },
+
       "&.Mui-focused fieldset": {
-        borderColor: "#6366f1",
+        borderColor: theme.palette.primary.main,
         borderWidth: "1.5px",
       },
     },
+
     "& .MuiInputLabel-root": {
-      color: "#64748b",
+      color: theme.palette.text.secondary,
       fontWeight: 500,
-      "&.Mui-focused": { color: "#4f46e5", fontWeight: 600 },
+
+      "&.Mui-focused": {
+        color: theme.palette.primary.main,
+        fontWeight: 600,
+      },
     },
-    "& .MuiInputBase-input": { fontWeight: 500, color: "#0f172a" },
+
+    "& .MuiInputBase-input": {
+      fontWeight: 500,
+      color: theme.palette.text.primary,
+    },
   };
 
-  // Live password-match feedback
   const passwordsMatch =
     form.confirm.length > 0 && form.password === form.confirm;
+
   const passwordsMismatch =
     form.confirm.length > 0 && form.password !== form.confirm;
 
@@ -108,10 +142,14 @@ function ResetPassword() {
         alignItems: "center",
         justifyContent: "center",
         py: { xs: 6, md: 8 },
-        background:
-          "radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%), " +
-          "radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%), " +
-          "#fafaff",
+
+        background: isDark
+          ? `radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.16), transparent 60%),
+             radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%),
+             ${theme.palette.background.default}`
+          : `radial-gradient(1000px 500px at 10% -10%, rgba(99,102,241,0.12), transparent 60%),
+             radial-gradient(900px 450px at 110% 0%, rgba(236,72,153,0.10), transparent 60%),
+             ${theme.palette.background.default}`,
       }}
     >
       <Container maxWidth="sm">
@@ -121,14 +159,20 @@ function ResetPassword() {
             maxWidth: 460,
             mx: "auto",
             borderRadius: "24px",
-            background: "rgba(255, 255, 255, 0.85)",
+
+            backgroundColor: theme.palette.background.paper,
             backdropFilter: "saturate(180%) blur(20px)",
             WebkitBackdropFilter: "saturate(180%) blur(20px)",
-            border: "1px solid rgba(15, 23, 42, 0.06)",
-            boxShadow:
-              "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
+
+            border: `1px solid ${theme.palette.divider}`,
+
+            boxShadow: isDark
+              ? "0 30px 60px -30px rgba(0, 0, 0, 0.55), 0 10px 24px -12px rgba(99, 102, 241, 0.20)"
+              : "0 30px 60px -30px rgba(99, 102, 241, 0.35), 0 10px 24px -12px rgba(139, 92, 246, 0.20)",
+
             overflow: "hidden",
             p: { xs: 3.5, sm: 4.5 },
+
             "&::before": {
               content: '""',
               position: "absolute",
@@ -140,7 +184,7 @@ function ResetPassword() {
             },
           }}
         >
-          {/* Brand mark + heading */}
+          {/* Brand mark and heading */}
           <Box sx={{ textAlign: "center", mb: 4 }}>
             <Box
               sx={{
@@ -165,7 +209,7 @@ function ResetPassword() {
               sx={{
                 fontWeight: 800,
                 letterSpacing: "-0.8px",
-                color: "#0f172a",
+                color: "text.primary",
                 mb: 0.75,
                 fontSize: { xs: "1.6rem", sm: "1.85rem" },
               }}
@@ -175,7 +219,11 @@ function ResetPassword() {
 
             <Typography
               variant="body2"
-              sx={{ color: "#64748b", fontWeight: 500, fontSize: "0.92rem" }}
+              sx={{
+                color: "text.secondary",
+                fontWeight: 500,
+                fontSize: "0.92rem",
+              }}
             >
               Choose a new password for your account
             </Typography>
@@ -185,7 +233,11 @@ function ResetPassword() {
           <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{ display: "flex", flexDirection: "column", gap: 2.25 }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2.25,
+            }}
           >
             {/* New password */}
             <TextField
@@ -203,10 +255,14 @@ function ResetPassword() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <LockOutlinedIcon
-                        sx={{ fontSize: 20, color: "#94a3b8" }}
+                        sx={{
+                          fontSize: 20,
+                          color: "text.secondary",
+                        }}
                       />
                     </InputAdornment>
                   ),
+
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
@@ -214,8 +270,10 @@ function ResetPassword() {
                         edge="end"
                         size="small"
                         sx={{
-                          color: "#94a3b8",
-                          "&:hover": { color: "#4f46e5" },
+                          color: "text.secondary",
+                          "&:hover": {
+                            color: "primary.main",
+                          },
                         }}
                         aria-label={
                           showPassword ? "Hide password" : "Show password"
@@ -250,10 +308,14 @@ function ResetPassword() {
                   startAdornment: (
                     <InputAdornment position="start">
                       <LockOutlinedIcon
-                        sx={{ fontSize: 20, color: "#94a3b8" }}
+                        sx={{
+                          fontSize: 20,
+                          color: "text.secondary",
+                        }}
                       />
                     </InputAdornment>
                   ),
+
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
@@ -261,8 +323,10 @@ function ResetPassword() {
                         edge="end"
                         size="small"
                         sx={{
-                          color: "#94a3b8",
-                          "&:hover": { color: "#4f46e5" },
+                          color: "text.secondary",
+                          "&:hover": {
+                            color: "primary.main",
+                          },
                         }}
                         aria-label={
                           showConfirm
@@ -290,7 +354,7 @@ function ResetPassword() {
                   alignItems: "center",
                   gap: 0.75,
                   mt: -1,
-                  color: "#059669",
+                  color: "success.main",
                   fontSize: "0.82rem",
                   fontWeight: 600,
                 }}
@@ -306,7 +370,7 @@ function ResetPassword() {
                   mt: -1,
                   fontSize: "0.82rem",
                   fontWeight: 600,
-                  color: "#e11d48",
+                  color: "error.main",
                 }}
               >
                 Passwords do not match
@@ -333,22 +397,33 @@ function ResetPassword() {
                 background: brandGradient,
                 backgroundSize: "200% 200%",
                 color: "#fff",
+
                 boxShadow:
                   "0 12px 24px -10px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
+
                 transition: "all 0.3s ease",
+
                 "&:hover": {
                   backgroundPosition: "100% 50%",
                   boxShadow:
                     "0 16px 32px -10px rgba(139, 92, 246, 0.85), inset 0 1px 0 rgba(255,255,255,0.3)",
                   transform: "translateY(-1px)",
                 },
+
                 "&:disabled": {
-                  background:
-                    "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
+                  background: isDark
+                    ? "linear-gradient(135deg, #373b68 0%, #51436f 100%)"
+                    : "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
                   color: "#fff",
                 },
-                "& .MuiButton-endIcon": { transition: "transform 0.25s ease" },
-                "&:hover .MuiButton-endIcon": { transform: "translateX(3px)" },
+
+                "& .MuiButton-endIcon": {
+                  transition: "transform 0.25s ease",
+                },
+
+                "&:hover .MuiButton-endIcon": {
+                  transform: "translateX(3px)",
+                },
               }}
             >
               {loading ? (
@@ -368,12 +443,15 @@ function ResetPassword() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 0.75,
-                color: "#4f46e5",
+                color: "primary.main",
                 fontSize: "0.88rem",
                 fontWeight: 600,
                 textDecoration: "none",
                 transition: "color 0.2s ease",
-                "&:hover": { color: "#8b5cf6" },
+
+                "&:hover": {
+                  color: "secondary.main",
+                },
               }}
             >
               <ArrowBackIcon sx={{ fontSize: 16 }} />

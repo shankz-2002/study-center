@@ -10,6 +10,7 @@ import {
   Typography,
   Chip,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -27,6 +28,8 @@ function Home() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
 
   const fetchFields = async () => {
     try {
@@ -39,7 +42,6 @@ function Home() {
       }
     } catch (error) {
       const err = error as ApiError;
-
       toast.error(err.data?.message || "Failed to fetch fields");
     } finally {
       setLoading(false);
@@ -51,29 +53,29 @@ function Home() {
     fetchFields();
   }, []);
 
-  // ---- Design tokens (match Navbar) ----
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
-  const brandGradientSoft =
-    "linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.12) 50%, rgba(236,72,153,0.12) 100%)";
-  const cardHoverShadow =
-    "0 20px 40px -20px rgba(99, 102, 241, 0.35), 0 8px 16px -8px rgba(139, 92, 246, 0.2)";
+
+  const brandGradientSoft = isDark
+    ? "linear-gradient(135deg, rgba(99,102,241,0.20), rgba(139,92,246,0.20), rgba(236,72,153,0.20))"
+    : "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.12), rgba(236,72,153,0.12))";
+
+  const cardHoverShadow = isDark
+    ? "0 20px 40px -20px rgba(0,0,0,0.6)"
+    : "0 20px 40px -20px rgba(99,102,241,0.35), 0 8px 16px -8px rgba(139,92,246,0.2)";
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        // Soft ambient gradient background — modern "study app" feel
-        background:
-          "radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,0.10), transparent 60%), " +
-          "radial-gradient(1000px 500px at 110% 0%, rgba(236,72,153,0.08), transparent 60%), " +
-          "#fafaff",
-        pt: { xs: 6, md: 9 },
+        backgroundColor: theme.palette.background.default,
+        pt: { xs: 5, md: 7 },
         pb: { xs: 8, md: 12 },
+        transition: "background-color 0.3s ease",
       }}
     >
       <Container maxWidth="lg">
-        {/* ---------------- Hero / Header ---------------- */}
+        {/* Hero */}
         <Box
           sx={{
             textAlign: "center",
@@ -81,7 +83,6 @@ function Home() {
             position: "relative",
           }}
         >
-          {/* Small eyebrow chip */}
           <Chip
             icon={<ExploreIcon sx={{ fontSize: 16 }} />}
             label="Pick a path, start learning"
@@ -93,15 +94,19 @@ function Home() {
               fontWeight: 600,
               fontSize: "0.78rem",
               letterSpacing: "0.2px",
-              color: "#4f46e5",
-              backgroundColor: "rgba(99, 102, 241, 0.08)",
-              border: "1px solid rgba(99, 102, 241, 0.18)",
+              color: "primary.main",
+              bgcolor: isDark
+                ? "rgba(99,102,241,0.18)"
+                : "rgba(99,102,241,0.08)",
+              border: 1,
+              borderColor: isDark
+                ? "rgba(99,102,241,0.35)"
+                : "rgba(99,102,241,0.18)",
               borderRadius: "999px",
-              "& .MuiChip-icon": { color: "#6366f1" },
+              "& .MuiChip-icon": { color: "primary.main" },
             }}
           />
 
-          {/* Headline */}
           <Typography
             variant="h2"
             component="h1"
@@ -110,7 +115,7 @@ function Home() {
               letterSpacing: "-1.5px",
               lineHeight: 1.1,
               fontSize: { xs: "2.1rem", sm: "2.75rem", md: "3.4rem" },
-              color: "#0f172a",
+              color: "text.primary",
               mb: 2,
             }}
           >
@@ -128,11 +133,10 @@ function Home() {
             </Box>
           </Typography>
 
-          {/* Subtitle */}
           <Typography
             variant="body1"
             sx={{
-              color: "#64748b",
+              color: "text.secondary",
               maxWidth: 620,
               mx: "auto",
               fontSize: { xs: "1rem", md: "1.08rem" },
@@ -144,7 +148,7 @@ function Home() {
           </Typography>
         </Box>
 
-        {/* ---------------- Content ---------------- */}
+        {/* Content */}
         {loading ? (
           <Box
             sx={{
@@ -161,7 +165,7 @@ function Home() {
                 size={56}
                 thickness={4}
                 sx={{
-                  color: "#6366f1",
+                  color: "primary.main",
                   "& .MuiCircularProgress-circle": {
                     strokeLinecap: "round",
                   },
@@ -175,13 +179,15 @@ function Home() {
                   placeItems: "center",
                 }}
               >
-                <AutoStoriesIcon sx={{ fontSize: 22, color: "#8b5cf6" }} />
+                <AutoStoriesIcon
+                  sx={{ fontSize: 22, color: "secondary.main" }}
+                />
               </Box>
             </Box>
 
             <Typography
               variant="body2"
-              sx={{ color: "#94a3b8", fontWeight: 500 }}
+              sx={{ color: "text.secondary", fontWeight: 500 }}
             >
               Loading fields…
             </Typography>
@@ -195,8 +201,10 @@ function Home() {
                   sx={{
                     height: "100%",
                     borderRadius: "20px",
-                    background: "#ffffff",
-                    border: "1px solid rgba(15, 23, 42, 0.06)",
+                    bgcolor: "background.paper",
+                    color: "text.primary",
+                    border: 1,
+                    borderColor: "divider",
                     position: "relative",
                     overflow: "hidden",
                     transition:
@@ -213,7 +221,7 @@ function Home() {
                     },
                     "&:hover": {
                       transform: "translateY(-6px)",
-                      borderColor: "rgba(99, 102, 241, 0.25)",
+                      borderColor: "primary.main",
                       boxShadow: cardHoverShadow,
                       "& .field-icon-wrap": {
                         background: brandGradient,
@@ -247,7 +255,6 @@ function Home() {
                         gap: 2,
                       }}
                     >
-                      {/* Icon bubble */}
                       <Box
                         className="field-icon-wrap"
                         sx={{
@@ -257,7 +264,7 @@ function Home() {
                           display: "grid",
                           placeItems: "center",
                           background: brandGradientSoft,
-                          color: "#6366f1",
+                          color: "primary.main",
                           transition:
                             "background 0.28s ease, color 0.28s ease, transform 0.28s ease",
                         }}
@@ -265,7 +272,6 @@ function Home() {
                         <SchoolIcon sx={{ fontSize: 26 }} />
                       </Box>
 
-                      {/* Field name */}
                       <Typography
                         variant="h6"
                         component="h2"
@@ -273,18 +279,17 @@ function Home() {
                           fontWeight: 700,
                           fontSize: "1.15rem",
                           letterSpacing: "-0.3px",
-                          color: "#0f172a",
+                          color: "text.primary",
                           lineHeight: 1.35,
                         }}
                       >
                         {field.fieldName}
                       </Typography>
 
-                      {/* Description */}
                       <Typography
                         variant="body2"
                         sx={{
-                          color: "#64748b",
+                          color: "text.secondary",
                           lineHeight: 1.65,
                           flexGrow: 1,
                           display: "-webkit-box",
@@ -296,14 +301,13 @@ function Home() {
                         {field.description}
                       </Typography>
 
-                      {/* Footer CTA — plain Box with flex (no Stack typing issues) */}
                       <Box
                         sx={{
                           mt: 1,
                           display: "flex",
                           alignItems: "center",
                           gap: 0.75,
-                          color: "#4f46e5",
+                          color: "primary.main",
                           fontWeight: 700,
                           fontSize: "0.85rem",
                           letterSpacing: "-0.1px",

@@ -6,6 +6,7 @@ import {
   ListItemText,
   Typography,
   Chip,
+  useTheme,
 } from "@mui/material";
 
 import LayersOutlinedIcon from "@mui/icons-material/LayersOutlined";
@@ -18,8 +19,19 @@ function LevelSideBar({
   selectedLevel,
   onSelectLevel,
 }: LevelSideBarProps) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
+
+  const brandSoft = isDark
+    ? "rgba(129, 140, 248, 0.16)"
+    : "rgba(99, 102, 241, 0.10)";
+
+  const brandBorder = isDark
+    ? "rgba(129, 140, 248, 0.25)"
+    : "rgba(99, 102, 241, 0.18)";
 
   return (
     <Box sx={{ width: "100%", p: { xs: 2, md: 2.5 } }}>
@@ -56,7 +68,7 @@ function LevelSideBar({
               fontWeight: 800,
               fontSize: "1.05rem",
               letterSpacing: "-0.4px",
-              color: "#0f172a",
+              color: theme.palette.text.primary,
               lineHeight: 1.2,
             }}
           >
@@ -71,9 +83,9 @@ function LevelSideBar({
               minWidth: 22,
               fontSize: "0.72rem",
               fontWeight: 700,
-              color: "#4f46e5",
-              backgroundColor: "rgba(99, 102, 241, 0.10)",
-              border: "1px solid rgba(99, 102, 241, 0.18)",
+              color: theme.palette.primary.main,
+              backgroundColor: brandSoft,
+              border: `1px solid ${brandBorder}`,
               borderRadius: "8px",
               "& .MuiChip-label": { px: 0.75 },
             }}
@@ -103,12 +115,8 @@ function LevelSideBar({
                 py: 1.25,
                 border: "1px solid transparent",
                 transition: "all 0.22s ease",
-                backgroundColor: isActive
-                  ? "rgba(99, 102, 241, 0.08)"
-                  : "transparent",
-                borderColor: isActive
-                  ? "rgba(99, 102, 241, 0.25)"
-                  : "transparent",
+                backgroundColor: isActive ? brandSoft : "transparent",
+                borderColor: isActive ? brandBorder : "transparent",
 
                 "&::before": {
                   content: '""',
@@ -125,11 +133,17 @@ function LevelSideBar({
 
                 "&:hover": {
                   backgroundColor: isActive
-                    ? "rgba(99, 102, 241, 0.12)"
-                    : "rgba(99, 102, 241, 0.05)",
+                    ? isDark
+                      ? "rgba(129, 140, 248, 0.22)"
+                      : "rgba(99, 102, 241, 0.12)"
+                    : isDark
+                      ? "rgba(129, 140, 248, 0.10)"
+                      : "rgba(99, 102, 241, 0.05)",
                   borderColor: isActive
-                    ? "rgba(99, 102, 241, 0.30)"
-                    : "rgba(99, 102, 241, 0.15)",
+                    ? isDark
+                      ? "rgba(129, 140, 248, 0.35)"
+                      : "rgba(99, 102, 241, 0.30)"
+                    : brandBorder,
                   "&::before": { opacity: 1 },
                   "& .level-number": {
                     background: brandGradient,
@@ -138,9 +152,11 @@ function LevelSideBar({
                 },
 
                 "&.Mui-selected": {
-                  backgroundColor: "rgba(99, 102, 241, 0.08)",
+                  backgroundColor: brandSoft,
                   "&:hover": {
-                    backgroundColor: "rgba(99, 102, 241, 0.12)",
+                    backgroundColor: isDark
+                      ? "rgba(129, 140, 248, 0.22)"
+                      : "rgba(99, 102, 241, 0.12)",
                   },
                 },
 
@@ -151,7 +167,9 @@ function LevelSideBar({
 
                 "&.Mui-focusVisible": {
                   outline: "none",
-                  boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.18)",
+                  boxShadow: isDark
+                    ? "0 0 0 3px rgba(129, 140, 248, 0.22)"
+                    : "0 0 0 3px rgba(99, 102, 241, 0.18)",
                 },
               }}
             >
@@ -168,13 +186,11 @@ function LevelSideBar({
                   fontWeight: 800,
                   fontSize: "0.85rem",
                   letterSpacing: "-0.3px",
-                  color: isActive ? "#fff" : "#6366f1",
-                  background: isActive
-                    ? brandGradient
-                    : "rgba(99, 102, 241, 0.10)",
+                  color: isActive ? "#fff" : theme.palette.primary.main,
+                  background: isActive ? brandGradient : brandSoft,
                   border: isActive
                     ? "1px solid rgba(99, 102, 241, 0.35)"
-                    : "1px solid rgba(99, 102, 241, 0.15)",
+                    : `1px solid ${brandBorder}`,
                   boxShadow: isActive
                     ? "0 6px 14px -6px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.35)"
                     : "none",
@@ -194,7 +210,7 @@ function LevelSideBar({
                       fontWeight: isActive ? 700 : 600,
                       fontSize: "0.92rem",
                       letterSpacing: "-0.2px",
-                      color: isActive ? "#1e1b4b" : "#0f172a",
+                      color: theme.palette.text.primary,
                       lineHeight: 1.3,
                       mb: 0.25,
                     },
@@ -202,7 +218,7 @@ function LevelSideBar({
                   secondary: {
                     sx: {
                       fontSize: "0.78rem",
-                      color: "#64748b",
+                      color: theme.palette.text.secondary,
                       lineHeight: 1.45,
                       display: "-webkit-box",
                       WebkitLineClamp: 2,
@@ -235,7 +251,7 @@ function LevelSideBar({
                 <CheckCircleRoundedIcon
                   sx={{
                     fontSize: 18,
-                    color: "#6366f1",
+                    color: theme.palette.primary.main,
                     ml: 1,
                     flexShrink: 0,
                   }}

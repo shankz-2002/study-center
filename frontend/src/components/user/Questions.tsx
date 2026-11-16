@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import type { Question, QuestionTypeProps } from "../../types/Question";
 import { checkAnswer, getQuestions } from "../../services/question";
@@ -13,6 +14,7 @@ import {
   RadioGroup,
   Typography,
   Divider,
+  useTheme,
 } from "@mui/material";
 import type { QuizResult } from "../../types/Answer";
 
@@ -37,12 +39,16 @@ function Questions({
   const [submitting, setSubmitting] = useState(false);
   const [progress, setProgress] = useState<LevelProgress | null>(null);
 
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   // Fetch questions
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         setLoading(true);
         const response = await getQuestions(levelId);
+
         if (response?.data?.success) {
           setQuestions(response.data.questions);
         }
@@ -53,9 +59,11 @@ function Questions({
         setLoading(false);
       }
     };
+
     fetchQuestions();
   }, [levelId]);
 
+  // Fetch progress
   useEffect(() => {
     const fetchProgress = async () => {
       try {
@@ -79,17 +87,60 @@ function Questions({
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
 
-  const handleSingleAnswerChange = (questionId: string, answer: string) => {
+  const brandSoft = isDark
+    ? "rgba(129, 140, 248, 0.16)"
+    : "rgba(99, 102, 241, 0.10)";
+
+  const brandBorder = isDark
+    ? "rgba(129, 140, 248, 0.25)"
+    : "rgba(99, 102, 241, 0.18)";
+
+  const containerBackground = isDark
+    ? "rgba(30, 41, 59, 0.75)"
+    : "rgba(255, 255, 255, 0.85)";
+
+  const containerBorder = isDark
+    ? "rgba(148, 163, 184, 0.14)"
+    : "rgba(15, 23, 42, 0.06)";
+
+  const optionLabelSx = {
+    fontSize: "0.95rem",
+    color: theme.palette.text.primary,
+  };
+
+  const radioSx = {
+    color: theme.palette.text.disabled,
+    "&.Mui-checked": {
+      color: theme.palette.primary.main,
+    },
+  };
+
+  const checkboxSx = {
+    color: theme.palette.text.disabled,
+    "&.Mui-checked": {
+      color: theme.palette.secondary.main,
+    },
+  };
+
+  const handleSingleAnswerChange = (
+    questionId: string,
+    answer: string,
+  ) => {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
-  const handleMultipleSelectChange = (questionId: string, option: string) => {
+  const handleMultipleSelectChange = (
+    questionId: string,
+    option: string,
+  ) => {
     setAnswers((prev) => {
       const currentAnswers = (prev[questionId] as string[]) || [];
       const alreadySelected = currentAnswers.includes(option);
+
       const newAnswers = alreadySelected
         ? currentAnswers.filter((item) => item !== option)
         : [...currentAnswers, option];
+
       return { ...prev, [questionId]: newAnswers };
     });
   };
@@ -144,10 +195,10 @@ function Questions({
           gap: 2,
           minHeight: 240,
           borderRadius: "20px",
-          background: "rgba(255, 255, 255, 0.85)",
+          background: containerBackground,
           backdropFilter: "saturate(180%) blur(20px)",
           WebkitBackdropFilter: "saturate(180%) blur(20px)",
-          border: "1px solid rgba(15, 23, 42, 0.06)",
+          border: `1px solid ${containerBorder}`,
         }}
       >
         <Box sx={{ position: "relative", display: "inline-flex" }}>
@@ -155,10 +206,13 @@ function Questions({
             size={48}
             thickness={4}
             sx={{
-              color: "#6366f1",
-              "& .MuiCircularProgress-circle": { strokeLinecap: "round" },
+              color: theme.palette.primary.main,
+              "& .MuiCircularProgress-circle": {
+                strokeLinecap: "round",
+              },
             }}
           />
+
           <Box
             sx={{
               position: "absolute",
@@ -167,10 +221,22 @@ function Questions({
               placeItems: "center",
             }}
           >
-            <AutoStoriesIcon sx={{ fontSize: 20, color: "#8b5cf6" }} />
+            <AutoStoriesIcon
+              sx={{
+                fontSize: 20,
+                color: theme.palette.secondary.main,
+              }}
+            />
           </Box>
         </Box>
-        <Typography variant="body2" sx={{ color: "#94a3b8", fontWeight: 500 }}>
+
+        <Typography
+          variant="body2"
+          sx={{
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+          }}
+        >
           Loading questions…
         </Typography>
       </Box>
@@ -183,15 +249,20 @@ function Questions({
       <Box
         sx={{
           borderRadius: "20px",
-          background: "rgba(255, 255, 255, 0.85)",
+          background: containerBackground,
           backdropFilter: "saturate(180%) blur(20px)",
           WebkitBackdropFilter: "saturate(180%) blur(20px)",
-          border: "1px solid rgba(15, 23, 42, 0.06)",
+          border: `1px solid ${containerBorder}`,
           p: 4,
           textAlign: "center",
         }}
       >
-        <Typography sx={{ color: "#64748b", fontWeight: 500 }}>
+        <Typography
+          sx={{
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+          }}
+        >
           No questions available for this level yet.
         </Typography>
       </Box>
@@ -233,15 +304,20 @@ function Questions({
             sx={{
               fontWeight: 800,
               letterSpacing: "-0.6px",
-              color: "#0f172a",
+              color: theme.palette.text.primary,
               lineHeight: 1.2,
             }}
           >
             Practice questions
           </Typography>
+
           <Typography
             variant="body2"
-            sx={{ color: "#64748b", fontWeight: 500, mt: 0.25 }}
+            sx={{
+              color: theme.palette.text.secondary,
+              fontWeight: 500,
+              mt: 0.25,
+            }}
           >
             {questions.length} question{questions.length === 1 ? "" : "s"} ·
             answer all to check your score
@@ -249,6 +325,7 @@ function Questions({
         </Box>
       </Box>
 
+      {/* ---------------- Completion banner ---------------- */}
       {completed && progress && (
         <Box
           sx={{
@@ -256,15 +333,19 @@ function Questions({
             mb: 4,
             p: 3,
             borderRadius: "20px",
-            background: "rgba(34, 197, 94, 0.08)",
-            border: "1px solid rgba(34, 197, 94, 0.2)",
+            background: isDark
+              ? "rgba(34, 197, 94, 0.12)"
+              : "rgba(34, 197, 94, 0.08)",
+            border: isDark
+              ? "1px solid rgba(74, 222, 128, 0.25)"
+              : "1px solid rgba(34, 197, 94, 0.2)",
           }}
         >
           <Typography
             variant="h6"
             sx={{
               fontWeight: 700,
-              color: "#166534",
+              color: theme.palette.success.main,
               mb: 0.5,
             }}
           >
@@ -278,7 +359,7 @@ function Questions({
         </Box>
       )}
 
-      {/* ---------------- Result banner (after submit) ---------------- */}
+      {/* ---------------- Result banner ---------------- */}
       {result && (
         <Box
           sx={{
@@ -313,7 +394,9 @@ function Questions({
                 flexShrink: 0,
               }}
             >
-              <EmojiEventsOutlinedIcon sx={{ fontSize: 28, color: "#fff" }} />
+              <EmojiEventsOutlinedIcon
+                sx={{ fontSize: 28, color: "#fff" }}
+              />
             </Box>
 
             <Box sx={{ flex: 1 }}>
@@ -329,6 +412,7 @@ function Questions({
               >
                 Your result
               </Typography>
+
               <Typography
                 sx={{
                   fontWeight: 800,
@@ -348,7 +432,7 @@ function Questions({
         </Box>
       )}
 
-      {/* ---------------- Questions (single flowing page) ---------------- */}
+      {/* ---------------- Questions ---------------- */}
       <Box sx={{ mt: 3 }}>
         {questions.map((question, index) => (
           <Box key={question.id}>
@@ -368,9 +452,9 @@ function Questions({
                     height: 34,
                     flexShrink: 0,
                     borderRadius: "10px",
-                    background: "rgba(99, 102, 241, 0.10)",
-                    border: "1px solid rgba(99, 102, 241, 0.18)",
-                    color: "#4f46e5",
+                    background: brandSoft,
+                    border: `1px solid ${brandBorder}`,
+                    color: theme.palette.primary.main,
                     display: "grid",
                     placeItems: "center",
                     fontWeight: 800,
@@ -386,7 +470,7 @@ function Questions({
                     fontWeight: 700,
                     fontSize: { xs: "1rem", md: "1.08rem" },
                     letterSpacing: "-0.3px",
-                    color: "#0f172a",
+                    color: theme.palette.text.primary,
                     lineHeight: 1.55,
                     pt: 0.25,
                   }}
@@ -408,22 +492,12 @@ function Questions({
                     <FormControlLabel
                       key={option}
                       value={option}
-                      control={
-                        <Radio
-                          disabled={completed}
-                          sx={{
-                            color: "#94a3b8",
-                            "&.Mui-checked": { color: "#6366f1" },
-                          }}
-                        />
-                      }
+                      disabled={completed}
+                      control={<Radio sx={radioSx} />}
                       label={option}
                       sx={{
                         mb: 0.5,
-                        "& .MuiFormControlLabel-label": {
-                          fontSize: "0.95rem",
-                          color: "#334155",
-                        },
+                        "& .MuiFormControlLabel-label": optionLabelSx,
                       }}
                     />
                   ))}
@@ -440,7 +514,7 @@ function Questions({
                         fontWeight: 700,
                         letterSpacing: "0.4px",
                         textTransform: "uppercase",
-                        color: "#8b5cf6",
+                        color: theme.palette.secondary.main,
                         mb: 1,
                       }}
                     >
@@ -455,27 +529,24 @@ function Questions({
                       return (
                         <FormControlLabel
                           key={option}
+                          disabled={completed}
                           control={
                             <Checkbox
-                              disabled={completed}
                               checked={selected}
                               onChange={() =>
-                                handleMultipleSelectChange(question.id, option)
+                                handleMultipleSelectChange(
+                                  question.id,
+                                  option,
+                                )
                               }
-                              sx={{
-                                color: "#94a3b8",
-                                "&.Mui-checked": { color: "#8b5cf6" },
-                              }}
+                              sx={checkboxSx}
                             />
                           }
                           label={option}
                           sx={{
                             mb: 0.5,
                             display: "flex",
-                            "& .MuiFormControlLabel-label": {
-                              fontSize: "0.95rem",
-                              color: "#334155",
-                            },
+                            "& .MuiFormControlLabel-label": optionLabelSx,
                           }}
                         />
                       );
@@ -494,49 +565,36 @@ function Questions({
                 >
                   <FormControlLabel
                     value="true"
-                    control={
-                      <Radio
-                        sx={{
-                          color: "#94a3b8",
-                          "&.Mui-checked": { color: "#6366f1" },
-                        }}
-                      />
-                    }
+                    disabled={completed}
+                    control={<Radio sx={radioSx} />}
                     label="True"
                     sx={{
                       mb: 0.5,
-                      "& .MuiFormControlLabel-label": {
-                        fontSize: "0.95rem",
-                        color: "#334155",
-                      },
+                      "& .MuiFormControlLabel-label": optionLabelSx,
                     }}
                   />
+
                   <FormControlLabel
                     value="false"
-                    control={
-                      <Radio
-                        sx={{
-                          color: "#94a3b8",
-                          "&.Mui-checked": { color: "#6366f1" },
-                        }}
-                      />
-                    }
+                    disabled={completed}
+                    control={<Radio sx={radioSx} />}
                     label="False"
                     sx={{
                       mb: 0.5,
-                      "& .MuiFormControlLabel-label": {
-                        fontSize: "0.95rem",
-                        color: "#334155",
-                      },
+                      "& .MuiFormControlLabel-label": optionLabelSx,
                     }}
                   />
                 </RadioGroup>
               )}
             </Box>
 
-            {/* Divider between questions (not after the last) */}
+            {/* Divider between questions */}
             {index < questions.length - 1 && (
-              <Divider sx={{ borderColor: "rgba(15, 23, 42, 0.08)" }} />
+              <Divider
+                sx={{
+                  borderColor: theme.palette.divider,
+                }}
+              />
             )}
           </Box>
         ))}
@@ -564,15 +622,21 @@ function Questions({
             boxShadow:
               "0 12px 24px -10px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.25)",
             transition: "all 0.3s ease",
+
             "&:hover": {
               backgroundPosition: "100% 50%",
               boxShadow:
                 "0 16px 32px -10px rgba(139, 92, 246, 0.85), inset 0 1px 0 rgba(255,255,255,0.3)",
               transform: "translateY(-1px)",
             },
+
             "&:disabled": {
-              background: "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
-              color: "#fff",
+              background: isDark
+                ? "rgba(148, 163, 184, 0.22)"
+                : "linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 100%)",
+              color: isDark
+                ? "rgba(255, 255, 255, 0.45)"
+                : "#fff",
             },
           }}
         >
