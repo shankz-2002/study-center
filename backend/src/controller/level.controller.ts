@@ -65,4 +65,13 @@ export class levelControler {
       levels,
     });
   };
+  static getCompletedLevels=async (req:AuthRequest,res:Response) => {
+    const userId=String(req?.user?.id)
+    const levelsCompleted=await levelService.getCompletedLevels(userId);
+    res.status(200).json({
+      success:true,
+      levelsCompleted
+    })
+    
+  }
 }

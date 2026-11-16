@@ -15,3 +15,7 @@ export const updateLevel = async (id: string, data: LevelData) => {
 export const deleteLevel = async (id: string) => {
   return await commonAPI("DELETE", `${baseUrl}/admin/level/${id}`);
 };
+export const getLevelsCompleted=async () => {
+  return await commonAPI('GET', `${baseUrl}/level`)
+  
+}

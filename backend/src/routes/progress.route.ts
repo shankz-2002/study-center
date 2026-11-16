@@ -5,5 +5,6 @@ const progressRouter = express.Router();
 progressRouter.use(authMiddleware.authenticate);
 
 progressRouter.get("/:id", levelProgressController.checkProgress);
+progressRouter.get("",levelProgressController.continueLearning )
 
 export default progressRouter;

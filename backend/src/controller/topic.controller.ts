@@ -1,9 +1,7 @@
 import type { Request, Response } from "express";
 import { topicService } from "../service/topic.service.js";
-import { categoryController } from "./category.controller.js";
 import { categoryService } from "../service/category.service.js";
 import { ApiError } from "../utils/ApiError.js";
-import { json } from "node:stream/consumers";
 import { topicRepository } from "../utils/repository.js";
 import { UserTopicCompletionService } from "../service/userLevelCompletion.service.js";
 import type { AuthRequest } from "../types/authRequest.js";
@@ -64,7 +62,7 @@ export class topicController {
       topic,
     });
   };
-  static getTopics = async (rqe: Request, res: Response) => {
+  static getTopics = async (req: Request, res: Response) => {
     const topics = await topicService.getTopics();
     res.status(200).json({
       success: true,
@@ -79,6 +77,14 @@ export class topicController {
       success:true,
       completed:!!completion,
       completion
+    })
+  }
+  static countTopicCompletion=async (req:AuthRequest,res:Response) => {
+    const userId=String(req.user?.id);
+    const topicsCompleted=await topicService.countTopicCompletion(userId);
+    res.status(200).json({
+      success:true,
+      topicsCompleted
     })
     
   }

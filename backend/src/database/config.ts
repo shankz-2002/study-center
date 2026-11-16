@@ -1,3 +1,4 @@
+
 import "dotenv/config";
 import { DataSource } from "typeorm";
 
@@ -12,14 +13,30 @@ import { UserLevelProgress } from "../entity/levelProgress.js";
 import { UserTopicCompletion } from "../entity/userTopicCompletion.js";
 import { PasswordResetToken } from "../entity/passwordReset.js";
 
+const isNeon = Boolean(process.env.DATABASE_URL);
+
 export const AppDataSource = new DataSource({
   type: "postgres",
-  url: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+
+  // Neon or local PostgreSQL
+  ...(isNeon
+    ? {
+        url: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      }
+    : {
+        host: process.env.DB_HOST || "localhost",
+        port: Number(process.env.DB_PORT || 5432),
+        username: process.env.DB_USER || "postgres",
+        password: process.env.DB_PASSWORD || "",
+        database: process.env.DB_NAME,
+      }),
+
   synchronize: true,
   logging: false,
+
   entities: [
     Fields,
     Category,

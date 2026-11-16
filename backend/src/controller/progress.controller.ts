@@ -12,4 +12,12 @@ export class levelProgressController {
       progress,
     });
   };
+  static continueLearning = async (req: AuthRequest, res: Response) => {
+    const userId = String(req?.user?.id);
+    const topics = await levelProgressService.continueLearning(userId);
+    res.status(200).json({
+      success:true,
+      topics
+    })
+  };
 }

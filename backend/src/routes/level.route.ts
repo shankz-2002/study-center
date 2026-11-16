@@ -5,6 +5,8 @@ const levelRouter = express.Router();
 levelRouter.use(authMiddleware.authenticate);
 levelRouter.get("/:id/topics", levelControler.getAllLevels);
 levelRouter.get("/:id", levelControler.getLevel);
+levelRouter.get("/", levelControler.getCompletedLevels);
+
 
 
 export default levelRouter;

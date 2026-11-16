@@ -1,4 +1,5 @@
-import { Box, Typography } from "@mui/material";
+
+import { Box, Typography, useTheme } from "@mui/material";
 import type { UserTopicCompletion } from "../../types/Topic";
 
 import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined";
@@ -10,10 +11,12 @@ interface TopicCompletionProps {
 }
 
 function TopicCompletion({ completion }: TopicCompletionProps) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   const brandGradient =
     "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
 
-  // Format the completion date nicely
   const completedDate = new Date(completion.completedAt).toLocaleDateString(
     undefined,
     {
@@ -23,19 +26,35 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
     },
   );
 
+  const colors = {
+    card: theme.palette.background.paper,
+    text: theme.palette.text.primary,
+    secondaryText: theme.palette.text.secondary,
+    border: theme.palette.divider,
+    tileBackground: isDark
+      ? "rgba(255,255,255,0.04)"
+      : "rgba(15,23,42,0.03)",
+    accentBackground: isDark
+      ? "rgba(99,102,241,0.13)"
+      : "rgba(99,102,241,0.06)",
+    accentBorder: isDark
+      ? "rgba(129,140,248,0.25)"
+      : "rgba(99,102,241,0.18)",
+    green: theme.palette.success.main,
+    accent: theme.palette.primary.main,
+  };
+
   return (
     <Box
       sx={{
         position: "relative",
         mt: 5,
         borderRadius: "24px",
-        background: "rgba(255, 255, 255, 0.85)",
-        backdropFilter: "saturate(180%) blur(20px)",
-        WebkitBackdropFilter: "saturate(180%) blur(20px)",
-        border: "1px solid rgba(99, 102, 241, 0.18)",
-        boxShadow:
-          "0 30px 60px -30px rgba(99, 102, 241, 0.4), 0 10px 24px -12px rgba(139, 92, 246, 0.2)",
+        background: colors.card,
+        border: `1px solid ${colors.border}`,
+        boxShadow: theme.shadows[isDark ? 6 : 3],
         overflow: "hidden",
+        transition: "background-color 0.3s ease, border-color 0.3s ease",
         "&::before": {
           content: '""',
           position: "absolute",
@@ -47,7 +66,7 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
         },
       }}
     >
-      {/* ---------------- Header ---------------- */}
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -57,7 +76,6 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
           pb: { xs: 2, md: 2.5 },
         }}
       >
-        {/* Trophy bubble */}
         <Box
           sx={{
             width: 56,
@@ -68,8 +86,7 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
             display: "grid",
             placeItems: "center",
             color: "#fff",
-            boxShadow:
-              "0 14px 28px -10px rgba(99, 102, 241, 0.7), inset 0 1px 0 rgba(255,255,255,0.35)",
+            boxShadow: "0 8px 20px rgba(99,102,241,0.3)",
           }}
         >
           <EmojiEventsOutlinedIcon sx={{ fontSize: 28 }} />
@@ -83,7 +100,7 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
               fontWeight: 800,
               letterSpacing: "-0.7px",
               fontSize: { xs: "1.25rem", md: "1.5rem" },
-              color: "#0f172a",
+              color: colors.text,
               lineHeight: 1.2,
             }}
           >
@@ -96,7 +113,7 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
               alignItems: "center",
               gap: 0.5,
               mt: 0.5,
-              color: "#16a34a",
+              color: colors.green,
               fontSize: "0.78rem",
               fontWeight: 700,
               letterSpacing: "0.4px",
@@ -109,7 +126,7 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
         </Box>
       </Box>
 
-      {/* ---------------- Stats grid ---------------- */}
+      {/* Stats grid */}
       <Box
         sx={{
           px: { xs: 3, md: 3.5 },
@@ -119,41 +136,47 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
           gap: 1.5,
         }}
       >
-        {/* Score */}
         <StatBox
           label="Overall score"
           value={`${completion.totalScore} / ${completion.totalPossibleScore}`}
+          colors={colors}
         />
 
-        {/* Percentage */}
         <StatBox
           label="Overall percentage"
           value={`${completion.percentage}%`}
           accent
+          colors={colors}
+          gradient={brandGradient}
         />
 
-        {/* Levels completed */}
         <StatBox
           label="Levels completed"
           value={`${completion.completedLevels} / ${completion.totalLevels}`}
+          colors={colors}
         />
 
-        {/* Date — takes full width on mobile, shares row on desktop */}
+        {/* Completion date */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 1.25,
             borderRadius: "14px",
-            background: "rgba(99, 102, 241, 0.06)",
-            border: "1px solid rgba(99, 102, 241, 0.14)",
+            background: colors.accentBackground,
+            border: `1px solid ${colors.accentBorder}`,
             px: 2,
             py: 1.5,
           }}
         >
           <CalendarTodayOutlinedIcon
-            sx={{ fontSize: 18, color: "#6366f1", flexShrink: 0 }}
+            sx={{
+              fontSize: 18,
+              color: colors.accent,
+              flexShrink: 0,
+            }}
           />
+
           <Box sx={{ minWidth: 0 }}>
             <Typography
               sx={{
@@ -161,18 +184,18 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
                 fontWeight: 700,
                 letterSpacing: "0.4px",
                 textTransform: "uppercase",
-                color: "#6366f1",
-                opacity: 0.85,
+                color: colors.accent,
                 mb: 0.25,
               }}
             >
               Completed on
             </Typography>
+
             <Typography
               sx={{
                 fontSize: "0.95rem",
                 fontWeight: 700,
-                color: "#0f172a",
+                color: colors.text,
                 letterSpacing: "-0.2px",
               }}
             >
@@ -185,27 +208,39 @@ function TopicCompletion({ completion }: TopicCompletionProps) {
   );
 }
 
-/* ---------------- Reusable stat tile ---------------- */
 interface StatBoxProps {
   label: string;
   value: string;
   accent?: boolean;
+  colors: {
+    text: string;
+    secondaryText: string;
+    border: string;
+    tileBackground: string;
+    accentBackground: string;
+    accentBorder: string;
+    accent: string;
+  };
+  gradient?: string;
 }
 
-function StatBox({ label, value, accent }: StatBoxProps) {
-  const brandGradient =
-    "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)";
-
+function StatBox({
+  label,
+  value,
+  accent,
+  colors,
+  gradient,
+}: StatBoxProps) {
   return (
     <Box
       sx={{
         borderRadius: "14px",
         background: accent
-          ? "rgba(99, 102, 241, 0.08)"
-          : "rgba(15, 23, 42, 0.03)",
-        border: accent
-          ? "1px solid rgba(99, 102, 241, 0.2)"
-          : "1px solid rgba(15, 23, 42, 0.06)",
+          ? colors.accentBackground
+          : colors.tileBackground,
+        border: `1px solid ${
+          accent ? colors.accentBorder : colors.border
+        }`,
         px: 2,
         py: 1.5,
       }}
@@ -216,8 +251,7 @@ function StatBox({ label, value, accent }: StatBoxProps) {
           fontWeight: 700,
           letterSpacing: "0.4px",
           textTransform: "uppercase",
-          color: accent ? "#6366f1" : "#64748b",
-          opacity: 0.9,
+          color: accent ? colors.accent : colors.secondaryText,
           mb: 0.25,
         }}
       >
@@ -229,11 +263,11 @@ function StatBox({ label, value, accent }: StatBoxProps) {
           fontSize: { xs: "1.15rem", md: "1.3rem" },
           fontWeight: 800,
           letterSpacing: "-0.5px",
-          color: accent ? "transparent" : "#0f172a",
-          background: accent ? brandGradient : "none",
+          color: accent ? "transparent" : colors.text,
+          background: accent ? gradient : "none",
           backgroundClip: accent ? "text" : "unset",
           WebkitBackgroundClip: accent ? "text" : "unset",
-          WebkitTextFillColor: accent ? "transparent" : "#0f172a",
+          WebkitTextFillColor: accent ? "transparent" : "unset",
           lineHeight: 1.2,
         }}
       >

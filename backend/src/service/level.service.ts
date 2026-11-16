@@ -6,6 +6,7 @@ import {
   progressRepository,
   topicRepository,
 } from "../utils/repository.js";
+import { userService } from "./user.service.js";
 
 export class levelService {
   static createLevel = async (
@@ -150,5 +151,14 @@ export class levelService {
         order: "ASC",
       },
     });
+  };
+  static getCompletedLevels = async (userId: string) => {
+    await userService.getUser(userId);
+    const  levelsCompleted = await progressRepository.count({
+      where: {
+        user: { id: userId },
+      },
+    });
+    return levelsCompleted
   };
 }

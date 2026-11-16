@@ -1,6 +1,11 @@
 import type { Category } from "../entity/category.js";
 import { ApiError } from "../utils/ApiError.js";
-import { categoryRepository, topicRepository } from "../utils/repository.js";
+import {
+  categoryRepository,
+  topicRepository,
+  userTopicCompletionRepository,
+} from "../utils/repository.js";
+import { userService } from "./user.service.js";
 
 export class topicService {
   static createTopic = async (
@@ -66,5 +71,14 @@ export class topicService {
         },
       },
     });
+  };
+  static countTopicCompletion = async (userId: string) => {
+    await userService.getUser(userId);
+    const topicsCompleted = await userTopicCompletionRepository.count({
+      where: {
+        user: { id: userId },
+      },
+    });
+    return topicsCompleted
   };
 }

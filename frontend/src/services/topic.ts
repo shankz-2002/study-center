@@ -18,3 +18,7 @@ export const deleteTopic = async (id: string) => {
 export const checkTopicCompletion = async (id: string) => {
   return await commonAPI("GET", `${baseUrl}/topic/${id}/completion`);
 };
+
+export const getTopicsCompleted = async () => {
+  return await commonAPI("GET", `${baseUrl}/topic`);
+};

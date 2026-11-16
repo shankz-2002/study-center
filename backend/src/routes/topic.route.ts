@@ -6,5 +6,6 @@ topicRouter.use(authMiddleware.authenticate);
 
 topicRouter.get("/:id", topicController.getTopic);
 topicRouter.get("/:id/completion", topicController.checkTopicCompletion);
+topicRouter.get("",topicController.countTopicCompletion)
 
 export default topicRouter;

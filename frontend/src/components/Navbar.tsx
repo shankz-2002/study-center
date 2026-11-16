@@ -22,6 +22,8 @@ import {
 } from "@mui/material";
 
 import { useTheme } from "@mui/material/styles";
+import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
+
 
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
@@ -250,6 +252,23 @@ function Navbar() {
             >
               Home
             </Button>
+            {user?.role === "USER" ? (
+              <Button
+                href="/user-dashboard"
+                startIcon={<SpaceDashboardOutlinedIcon sx={{ fontSize: 18 }} />}
+                sx={navButtonSx}
+              >
+                Dashboard
+              </Button>
+            ) : user?.role === "ADMIN" ? (
+              <Button
+                href="/admin-dashboard"
+                startIcon={<SpaceDashboardOutlinedIcon sx={{ fontSize: 18 }} />}
+                sx={navButtonSx}
+              >
+                Dashboard
+              </Button>
+            ) : null}
 
             {user ? (
               user.role === "ADMIN" ? (

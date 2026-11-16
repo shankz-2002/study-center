@@ -80,12 +80,17 @@ export class questionService {
         level: { id },
       },
     });
+
     if (progress) {
-      throw new ApiError(409, "Already answerd the questions and passed");
+      throw new ApiError(409, "Already answered the questions and passed");
     }
+
     const questions = await questionRepository.find({
       where: {
         level: { id },
+      },
+      order: {
+        order: "ASC",
       },
     });
 
@@ -98,54 +103,71 @@ export class questionService {
         continue;
       }
 
+      let isCorrect = false;
+
+      // MCQ comparison
       if (question.questionType === "MCQ") {
-        if (submittedAnswer === question.correctAnswer) {
-          score++;
-        }
+        isCorrect =
+          typeof submittedAnswer === "string" &&
+          typeof question.correctAnswer === "string" &&
+          submittedAnswer.trim() === question.correctAnswer.trim();
       }
 
+      // TRUE_FALSE comparison (case-insensitive)
       if (question.questionType === "TRUE_FALSE") {
-        if (submittedAnswer === question.correctAnswer) {
-          score++;
+        isCorrect =
+          typeof submittedAnswer === "string" &&
+          typeof question.correctAnswer === "string" &&
+          submittedAnswer.trim().toLowerCase() ===
+            question.correctAnswer.trim().toLowerCase();
+      }
+
+      // MULTIPLE_SELECT comparison
+      if (question.questionType === "MULTIPLE_SELECT") {
+        if (
+          Array.isArray(submittedAnswer) &&
+          Array.isArray(question.correctAnswer)
+        ) {
+          const submitted = submittedAnswer
+            .map((answer) => String(answer).trim())
+            .sort();
+
+          const correct = question.correctAnswer
+            .map((answer) => String(answer).trim())
+            .sort();
+
+          isCorrect =
+            submitted.length === correct.length &&
+            submitted.every((answer, index) => answer === correct[index]);
         }
       }
 
-      if (question.questionType === "MULTIPLE_SELECT") {
-        if (!Array.isArray(submittedAnswer)) {
-          continue;
-        }
-
-        if (!Array.isArray(question.correctAnswer)) {
-          continue;
-        }
-
-        const submitted = [...submittedAnswer].sort();
-        const correct = [...question.correctAnswer].sort();
-
-        const isCorrect =
-          submitted.length === correct.length &&
-          submitted.every((answer, index) => answer === correct[index]);
-
-        if (isCorrect) {
-          score++;
-        }
+      if (isCorrect) {
+        score++;
       }
     }
+
+    const total = questions.length;
+
     const percentage =
-      questions.length > 0 ? (score / questions.length) * 100 : 0;
+      total > 0 ? Number(((score / total) * 100).toFixed(2)) : 0;
+
     const passed = percentage >= 80;
+
     if (passed) {
       await levelProgressService.createProgress(userId, id, score, percentage);
-      await UserTopicCompletionService.createCompletion(userId,id);
+
+      await UserTopicCompletionService.createCompletion(userId, id);
     }
 
     return {
       score,
-      total: questions.length,
+      total,
       percentage,
       passed,
     };
   };
+
   static getQuestions = async () => {
     return await questionRepository.find({
       relations: {

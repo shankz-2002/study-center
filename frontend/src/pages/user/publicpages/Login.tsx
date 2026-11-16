@@ -62,7 +62,7 @@ function Login() {
       if (user.role === "ADMIN") {
         navigate("/admin/dashboard");
       } else {
-        navigate("/home");
+        navigate("/user-dashboard");
       }
     } catch (error) {
       const err = error as ApiError;
@@ -87,7 +87,7 @@ function Login() {
         if (response.data.result.user.role === "ADMIN") {
           navigate("/admin/dashboard");
         } else {
-          navigate("/home");
+          navigate("/user-dashboard");
         }
       }
     } catch (error) {
