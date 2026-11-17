@@ -26,3 +26,6 @@ export const getUserDetails = async () => {
 export const updateUserDetails = async (data: ProfileFormData) => {
   return await commonAPI("PUT", `${baseUrl}/auth`, data);
 };
+export const tempSignIn = async () => {
+  return await commonAPI("GET", `${baseUrl}/auth/temp`);
+};

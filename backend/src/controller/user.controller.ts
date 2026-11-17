@@ -107,4 +107,11 @@ export class userController {
       user,
     });
   };
+  static tempSignIn = async (req: Request, res: Response) => {
+    const result = await userService.tempSignIn();
+    res.status(200).json({
+      success: true,
+      result,
+    });
+  };
 }

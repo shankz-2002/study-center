@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { loginApi, sendCredential } from "../../../services/auth";
+import { loginApi, sendCredential, tempSignIn } from "../../../services/auth";
 import { useAuth } from "../../../context/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
@@ -93,6 +92,22 @@ function Login() {
     } catch (error) {
       const err = error as ApiError;
       toast.error(err?.data?.message || "Login Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleTemp = async () => {
+    try {
+      setLoading(true);
+      const response = await tempSignIn();
+      if (response.data.success) {
+        toast.success("Login successful");
+        login(response.data.result.user, response.data.result.accessToken);
+        navigate("/user-dashboard");
+      }
+    } catch (error) {
+      const err = error as ApiError;
+      toast.error(err?.data?.message || "Failed to Fetch");
     } finally {
       setLoading(false);
     }
@@ -350,8 +365,7 @@ function Login() {
 
                 "&:hover": {
                   backgroundPosition: "100% 50%",
-                  boxShadow:
-                    "0 16px 32px -10px rgba(139,92,246,0.85)",
+                  boxShadow: "0 16px 32px -10px rgba(139,92,246,0.85)",
                   transform: "translateY(-1px)",
                 },
 
@@ -462,6 +476,11 @@ function Login() {
               </Box>
             </Typography>
           </Box>
+        </Box>
+        <Box sx={{ mt: "5%", display: "flex", justifyContent: "center" }}>
+          <Button variant="contained" onClick={handleTemp} disabled={loading}>
+            {loading ? "Signing in..." : "Explore Demo Account"}
+          </Button>
         </Box>
       </Container>
     </Box>

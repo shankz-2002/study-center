@@ -7,6 +7,7 @@ import { getUserDetails } from "../../../services/auth";
 import {
   Avatar,
   Box,
+  Button,
   Card,
   CardActionArea,
   CardContent,
@@ -40,6 +41,8 @@ import { getContinueLearning } from "../../../services/progress";
 
 import type { ContinueLearningTopic } from "../../../types/Progress";
 import type { RecentlyCompletedTopic } from "../../../types/Topic";
+import { getFields } from "../../../services/field";
+import { type Field } from "../../../types/Field";
 
 /* ---------------------------------- Types --------------------------------- */
 
@@ -263,10 +266,7 @@ function SectionHeader({ icon, title }: SectionHeaderProps) {
   return (
     <Stack direction="row" spacing={1} sx={{ mb: 2, alignItems: "center" }}>
       {icon}
-      <Typography
-        variant="h5"
-        sx={{ fontWeight: 800, color: "text.primary" }}
-      >
+      <Typography variant="h5" sx={{ fontWeight: 800, color: "text.primary" }}>
         {title}
       </Typography>
     </Stack>
@@ -294,7 +294,11 @@ function EmptyState({ message }: { message: string }) {
 function DashboardSkeleton() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Skeleton variant="rounded" height={140} sx={{ borderRadius: 4, mb: 3 }} />
+      <Skeleton
+        variant="rounded"
+        height={140}
+        sx={{ borderRadius: 4, mb: 3 }}
+      />
 
       <Grid container spacing={3}>
         {[0, 1].map((i) => (
@@ -322,7 +326,7 @@ function UserDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [topicsCompleted, setTopicsCompleted] = useState(0);
   const [levelsCompleted, setLevelsCompleted] = useState(0);
-
+  const [fields, setFields] = useState<Field[] | null>([]);
   const [continueLearning, setContinueLearning] = useState<
     ContinueLearningTopic[]
   >([]);
@@ -340,10 +344,17 @@ function UserDashboard() {
           getLevelsCompleted(),
           getContinueLearning(),
           getRecentlyCompletedTopics(),
+          getFields(),
         ]);
 
-        const [userRes, topicsRes, levelsRes, continueRes, recentlyRes] =
-          results;
+        const [
+          userRes,
+          topicsRes,
+          levelsRes,
+          continueRes,
+          recentlyRes,
+          exploreFields,
+        ] = results;
 
         if (userRes.status === "fulfilled" && userRes.value.data.success) {
           setUser(userRes.value.data.user);
@@ -369,6 +380,12 @@ function UserDashboard() {
           recentlyRes.value.data.success
         ) {
           setRecentlyCompleted(recentlyRes.value.data.recentlyCompleted);
+        }
+        if (
+          exploreFields.status == "fulfilled" &&
+          exploreFields.value.data.success
+        ) {
+          setFields(exploreFields.value.data.fields);
         }
 
         const rejected = results.find((r) => r.status === "rejected");
@@ -632,6 +649,50 @@ function UserDashboard() {
             ))}
           </Grid>
         )}
+      </Box>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h5" sx={{ fontWeight: 800, mb: 2 }}>
+          Explore Fields
+        </Typography>
+
+        <Grid container spacing={2}>
+          {fields?.slice(0,3).map((field) => (
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={field.id}>
+              <Card
+                sx={{
+                  height: "100%",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 3,
+                  bgcolor: "background.paper",
+                  transition: "0.2s",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: 4,
+                  },
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                    {field.fieldName}
+                  </Typography>
+
+                  <Typography variant="body2" color="text.secondary">
+                    {field.description}
+                  </Typography>
+
+                  <Button
+                    href={`/fields/${field.id}`}
+                    endIcon={<ArrowForwardRoundedIcon />}
+                    sx={{ mt: 2 }}
+                  >
+                    Explore
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
     </Container>
   );

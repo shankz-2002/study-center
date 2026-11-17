@@ -185,12 +185,32 @@ export class userService {
       accessToken,
     };
   };
-  static updateUser=async (firstName:string,lastName:string,userId:string) => {
-    const user=await this.getUser(userId);
-    user.firstName=firstName;
-    user.lastName=lastName;
+  static updateUser = async (
+    firstName: string,
+    lastName: string,
+    userId: string,
+  ) => {
+    const user = await this.getUser(userId);
+    user.firstName = firstName;
+    user.lastName = lastName;
     return await userRepository.save(user);
-    
-  }
- 
+  };
+  static tempSignIn = async () => {
+    const existingUser = await userRepository.findOne({
+      where: { email: "temp@gmail.com" },
+    });
+    if (!existingUser) {
+      throw new ApiError(404, "User not found");
+    }
+    const accessToken = await tokenUtil.createToken(
+      existingUser.id,
+      existingUser.role,
+    );
+    const { password: _, createdAt, ...user } = existingUser;
+    const newUser = {
+      user,
+      accessToken,
+    };
+    return newUser;
+  };
 }
