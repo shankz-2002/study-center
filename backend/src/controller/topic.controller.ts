@@ -98,4 +98,13 @@ export class topicController {
       recentlyCompleted
     })
   };
+  static overallProgress=async (req:AuthRequest,res:Response) => {
+    const userId=String(req?.user?.id);
+    const overallProgress =await topicService.overallProgress(userId);
+    res.status(200).json({
+      success:true,
+      overallProgress 
+    })
+    
+  }
 }

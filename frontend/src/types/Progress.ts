@@ -11,3 +11,12 @@ export type ContinueLearningTopic = {
   completedLevels: number;
   percentage: number;
 };
+
+
+export type OverallProgress = {
+  totalTopics: number;
+  totalLevels: number;
+  completedTopics: number;
+  completedLevels: number;
+  overallProgress: number;
+};

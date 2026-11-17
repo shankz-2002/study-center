@@ -25,3 +25,6 @@ export const getTopicsCompleted = async () => {
 export const getRecentlyCompletedTopics = async () => {
   return await commonAPI("GET", `${baseUrl}/topic/recently`);
 };
+export const getOverallProgress = async () => {
+  return await commonAPI("GET", `${baseUrl}/topic/overall`);
+};

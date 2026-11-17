@@ -5,9 +5,9 @@ const topicRouter = express.Router();
 topicRouter.use(authMiddleware.authenticate);
 
 topicRouter.get("/recently", topicController.recentlyCompletedTopic);
-
+topicRouter.get("", topicController.countTopicCompletion);
+topicRouter.get("/overall",topicController.overallProgress)
 topicRouter.get("/:id", topicController.getTopic);
 topicRouter.get("/:id/completion", topicController.checkTopicCompletion);
-topicRouter.get("", topicController.countTopicCompletion);
 
 export default topicRouter;

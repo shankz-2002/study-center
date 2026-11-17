@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
-import type { ApiError } from "../../../types/Error";
 import type { User } from "../../../types/User";
+import type { Field } from "../../../types/Field";
+import type { ApiError } from "../../../types/Error";
+import type {
+  ContinueLearningTopic,
+  OverallProgress,
+} from "../../../types/Progress";
+import type { RecentlyCompletedTopic } from "../../../types/Topic";
+
 import { toast } from "react-toastify";
-import { getUserDetails } from "../../../services/auth";
+import { Link as RouterLink } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 
 import {
   Avatar,
@@ -22,35 +30,30 @@ import {
   alpha,
 } from "@mui/material";
 
-import { useTheme } from "@mui/material/styles";
-
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import LayersRoundedIcon from "@mui/icons-material/LayersRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import AutoStoriesRoundedIcon from "@mui/icons-material/AutoStoriesRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import ExploreRoundedIcon from "@mui/icons-material/ExploreRounded";
+import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 
-import { Link as RouterLink } from "react-router-dom";
-
+import { getUserDetails } from "../../../services/auth";
 import {
+  getOverallProgress,
   getRecentlyCompletedTopics,
   getTopicsCompleted,
 } from "../../../services/topic";
 import { getLevelsCompleted } from "../../../services/level";
 import { getContinueLearning } from "../../../services/progress";
-
-import type { ContinueLearningTopic } from "../../../types/Progress";
-import type { RecentlyCompletedTopic } from "../../../types/Topic";
 import { getFields } from "../../../services/field";
-import { type Field } from "../../../types/Field";
 
 /* ---------------------------------- Types --------------------------------- */
 
-type StatCardProps = {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-  accent: string;
+type ProgressSummaryCardProps = {
+  topicsCompleted: number;
+  levelsCompleted: number;
+  progress: OverallProgress | null;
 };
 
 type SectionHeaderProps = {
@@ -60,7 +63,16 @@ type SectionHeaderProps = {
 
 /* ------------------------------- Subcomponents ---------------------------- */
 
-function StatCard({ label, value, icon, accent }: StatCardProps) {
+function ProgressSummaryCard({
+  topicsCompleted,
+  levelsCompleted,
+  progress,
+}: ProgressSummaryCardProps) {
+  const safePercentage = Math.min(
+    100,
+    Math.max(0, progress?.overallProgress ?? 0),
+  );
+
   return (
     <Card
       elevation={0}
@@ -88,53 +100,156 @@ function StatCard({ label, value, icon, accent }: StatCardProps) {
           inset: 0,
           background: (t) =>
             `radial-gradient(circle at top right, ${alpha(
-              accent,
-              t.palette.mode === "dark" ? 0.22 : 0.12,
-            )}, transparent 65%)`,
+              t.palette.success.main,
+              t.palette.mode === "dark" ? 0.18 : 0.1,
+            )}, transparent 70%)`,
           pointerEvents: "none",
         },
       }}
     >
       <CardContent sx={{ p: 3, position: "relative" }}>
-        <Stack
-          direction="row"
-          sx={{ justifyContent: "space-between", alignItems: "flex-start" }}
-        >
-          <Box>
-            <Typography
-              variant="overline"
-              color="text.secondary"
-              sx={{ letterSpacing: 1 }}
+        {/* Top row: three mini stats */}
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Stack
+              direction="row"
+              spacing={1.25}
+              sx={{ alignItems: "center" }}
             >
-              {label}
-            </Typography>
+              <Box
+                sx={{
+                  p: 1,
+                  borderRadius: 2,
+                  bgcolor: (t) => alpha(t.palette.primary.main, 0.1),
+                  color: "primary.main",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                <MenuBookRoundedIcon fontSize="small" />
+              </Box>
+              <Box>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", lineHeight: 1.2 }}
+                >
+                  Topics
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 800 }}>
+                  {topicsCompleted.toLocaleString()}
+                </Typography>
+              </Box>
+            </Stack>
+          </Grid>
 
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 800,
-                lineHeight: 1.1,
-                mt: 0.5,
-                color: "text.primary",
-              }}
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Stack
+              direction="row"
+              spacing={1.25}
+              sx={{ alignItems: "center" }}
             >
-              {value.toLocaleString()}
-            </Typography>
-          </Box>
+              <Box
+                sx={{
+                  p: 1,
+                  borderRadius: 2,
+                  bgcolor: (t) => alpha(t.palette.secondary.main, 0.1),
+                  color: "secondary.main",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                <LayersRoundedIcon fontSize="small" />
+              </Box>
+              <Box>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", lineHeight: 1.2 }}
+                >
+                  Levels
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 800 }}>
+                  {levelsCompleted.toLocaleString()}
+                </Typography>
+              </Box>
+            </Stack>
+          </Grid>
 
-          <Box
-            sx={{
-              p: 1.25,
-              borderRadius: 3,
-              bgcolor: (t) =>
-                alpha(accent, t.palette.mode === "dark" ? 0.2 : 0.1),
-              color: accent,
-              display: "grid",
-              placeItems: "center",
-            }}
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Stack
+              direction="row"
+              spacing={1.25}
+              sx={{ alignItems: "center" }}
+            >
+              <Box
+                sx={{
+                  p: 1,
+                  borderRadius: 2,
+                  bgcolor: (t) => alpha(t.palette.success.main, 0.1),
+                  color: "success.main",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                <TrendingUpRoundedIcon fontSize="small" />
+              </Box>
+              <Box>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", lineHeight: 1.2 }}
+                >
+                  Overall
+                </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{ fontWeight: 800, color: "success.main" }}
+                >
+                  {safePercentage}%
+                </Typography>
+              </Box>
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <Divider sx={{ my: 2.5 }} />
+
+        {/* Bottom: overall progress bar */}
+        <Stack spacing={1}>
+          <Stack
+            direction="row"
+            sx={{ justifyContent: "space-between", alignItems: "center" }}
           >
-            {icon}
-          </Box>
+            <Typography variant="body2" color="text.secondary">
+              {progress?.completedLevels ?? 0} of{" "}
+              {progress?.totalLevels ?? 0} levels completed
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              {progress?.completedTopics ?? 0} /{" "}
+              {progress?.totalTopics ?? 0} topics
+            </Typography>
+          </Stack>
+
+          <LinearProgress
+            variant="determinate"
+            value={safePercentage}
+            sx={{
+              height: 10,
+              borderRadius: 5,
+              bgcolor: (t) =>
+                alpha(
+                  t.palette.success.main,
+                  t.palette.mode === "dark" ? 0.2 : 0.12,
+                ),
+              "& .MuiLinearProgress-bar": {
+                borderRadius: 5,
+                background: (t) =>
+                  `linear-gradient(90deg, ${t.palette.success.light}, ${t.palette.success.main})`,
+              },
+            }}
+          />
         </Stack>
       </CardContent>
     </Card>
@@ -266,6 +381,7 @@ function SectionHeader({ icon, title }: SectionHeaderProps) {
   return (
     <Stack direction="row" spacing={1} sx={{ mb: 2, alignItems: "center" }}>
       {icon}
+
       <Typography variant="h5" sx={{ fontWeight: 800, color: "text.primary" }}>
         {title}
       </Typography>
@@ -300,15 +416,15 @@ function DashboardSkeleton() {
         sx={{ borderRadius: 4, mb: 3 }}
       />
 
-      <Grid container spacing={3}>
-        {[0, 1].map((i) => (
-          <Grid key={i} size={{ xs: 12, sm: 6 }}>
-            <Skeleton variant="rounded" height={140} sx={{ borderRadius: 4 }} />
-          </Grid>
-        ))}
+      <Skeleton
+        variant="rounded"
+        height={200}
+        sx={{ borderRadius: 4, mb: 3 }}
+      />
 
-        {[0, 1].map((i) => (
-          <Grid key={`c-${i}`} size={{ xs: 12, md: 6 }}>
+      <Grid container spacing={3}>
+        {[0, 1, 2].map((i) => (
+          <Grid key={i} size={{ xs: 12, md: 4 }}>
             <Skeleton variant="rounded" height={200} sx={{ borderRadius: 4 }} />
           </Grid>
         ))}
@@ -324,9 +440,12 @@ function UserDashboard() {
 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+
   const [topicsCompleted, setTopicsCompleted] = useState(0);
   const [levelsCompleted, setLevelsCompleted] = useState(0);
-  const [fields, setFields] = useState<Field[] | null>([]);
+
+  const [fields, setFields] = useState<Field[]>([]);
+
   const [continueLearning, setContinueLearning] = useState<
     ContinueLearningTopic[]
   >([]);
@@ -334,6 +453,9 @@ function UserDashboard() {
   const [recentlyCompleted, setRecentlyCompleted] = useState<
     RecentlyCompletedTopic[]
   >([]);
+
+  const [overallProgress, setOverallProgress] =
+    useState<OverallProgress | null>(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -345,7 +467,28 @@ function UserDashboard() {
           getContinueLearning(),
           getRecentlyCompletedTopics(),
           getFields(),
+          getOverallProgress(),
         ]);
+
+        let hasError = false;
+
+        const handleFailure = <T extends { data: { success: boolean } }>(
+          result: PromiseSettledResult<T>,
+          section: string,
+        ) => {
+          if (
+            result.status === "rejected" ||
+            (result.status === "fulfilled" && !result.value.data.success)
+          ) {
+            hasError = true;
+            console.error(
+              `Failed to load ${section}:`,
+              result.status === "rejected"
+                ? result.reason
+                : "API returned success: false",
+            );
+          }
+        };
 
         const [
           userRes,
@@ -353,8 +496,17 @@ function UserDashboard() {
           levelsRes,
           continueRes,
           recentlyRes,
-          exploreFields,
+          fieldsRes,
+          overallRes,
         ] = results;
+
+        handleFailure(userRes, "user details");
+        handleFailure(topicsRes, "completed topics");
+        handleFailure(levelsRes, "completed levels");
+        handleFailure(continueRes, "continue learning");
+        handleFailure(recentlyRes, "recently completed topics");
+        handleFailure(fieldsRes, "fields");
+        handleFailure(overallRes, "overall progress");
 
         if (userRes.status === "fulfilled" && userRes.value.data.success) {
           setUser(userRes.value.data.user);
@@ -381,24 +533,26 @@ function UserDashboard() {
         ) {
           setRecentlyCompleted(recentlyRes.value.data.recentlyCompleted);
         }
-        if (
-          exploreFields.status == "fulfilled" &&
-          exploreFields.value.data.success
-        ) {
-          setFields(exploreFields.value.data.fields);
+
+        if (fieldsRes.status === "fulfilled" && fieldsRes.value.data.success) {
+          setFields(fieldsRes.value.data.fields);
         }
 
-        const rejected = results.find((r) => r.status === "rejected");
-        if (rejected) {
-          const err = (rejected as PromiseRejectedResult).reason as ApiError;
+        if (
+          overallRes.status === "fulfilled" &&
+          overallRes.value.data.success
+        ) {
+          setOverallProgress(overallRes.value.data.overallProgress);
+        }
+
+        if (hasError) {
           toast.warning(
-            err?.data?.message ||
-              "Some dashboard data couldn't be loaded. Please try again.",
+            "Some dashboard information couldn't be loaded. Please try again.",
           );
         }
       } catch (error) {
         const err = error as ApiError;
-        toast.error(err.data?.message || "Failed to fetch dashboard data");
+        toast.error(err?.data?.message || "Failed to fetch dashboard data");
       } finally {
         setLoading(false);
       }
@@ -524,40 +678,49 @@ function UserDashboard() {
         </Stack>
       </Box>
 
-      {/* Stats */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <StatCard
-            label="Topics Completed"
-            value={topicsCompleted}
-            icon={<MenuBookRoundedIcon />}
-            accent={theme.palette.primary.main}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6 }}>
-          <StatCard
-            label="Levels Completed"
-            value={levelsCompleted}
-            icon={<LayersRoundedIcon />}
-            accent={theme.palette.secondary.main}
-          />
-        </Grid>
-      </Grid>
-
-      {/* Continue learning */}
+      {/* Progress summary (merged card) */}
       <Box sx={{ mb: 4 }}>
-        <SectionHeader
-          icon={<AutoStoriesRoundedIcon color="primary" />}
-          title="Continue Learning"
+        <ProgressSummaryCard
+          topicsCompleted={topicsCompleted}
+          levelsCompleted={levelsCompleted}
+          progress={overallProgress}
         />
+      </Box>
+
+      {/* Continue Learning */}
+      <Box sx={{ mb: 4 }}>
+        <Stack
+          direction="row"
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <SectionHeader
+            icon={<AutoStoriesRoundedIcon color="primary" />}
+            title="Continue Learning"
+          />
+
+          {continueLearning.length > 3 && (
+            <Button
+              component={RouterLink}
+              to="/topics?filter=in-progress"
+              size="small"
+              endIcon={<ArrowForwardRoundedIcon />}
+              sx={{ fontWeight: 600 }}
+            >
+              View all
+            </Button>
+          )}
+        </Stack>
 
         {continueLearning.length === 0 ? (
           <EmptyState message="No topics in progress. Start learning something new!" />
         ) : (
           <Grid container spacing={3}>
-            {continueLearning.map((topic) => (
-              <Grid size={{ xs: 12, md: 6 }} key={topic.topicId}>
+            {continueLearning.slice(0, 3).map((topic) => (
+              <Grid size={{ xs: 12, md: 4 }} key={topic.topicId}>
                 <ContinueCard topic={topic} />
               </Grid>
             ))}
@@ -565,7 +728,7 @@ function UserDashboard() {
         )}
       </Box>
 
-      {/* Recently completed */}
+      {/* Recently Completed */}
       <Box sx={{ mb: 4 }}>
         <SectionHeader
           icon={<CheckCircleRoundedIcon color="success" />}
@@ -575,7 +738,7 @@ function UserDashboard() {
         {recentlyCompleted.length === 0 ? (
           <EmptyState message="You haven't completed any topics yet. Start learning to see your achievements here!" />
         ) : (
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             {recentlyCompleted.map((topic) => (
               <Grid size={{ xs: 12, md: 4 }} key={topic.topicId}>
                 <Card
@@ -640,7 +803,11 @@ function UserDashboard() {
                       Completed on{" "}
                       {new Date(topic.completedAt).toLocaleDateString(
                         undefined,
-                        { year: "numeric", month: "short", day: "numeric" },
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        },
                       )}
                     </Typography>
                   </CardContent>
@@ -650,49 +817,124 @@ function UserDashboard() {
           </Grid>
         )}
       </Box>
+
+      {/* Explore Fields */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: 800, mb: 2 }}>
-          Explore Fields
-        </Typography>
+        <Stack
+          direction="row"
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <SectionHeader
+            icon={<ExploreRoundedIcon color="primary" />}
+            title="Explore Fields"
+          />
 
-        <Grid container spacing={2}>
-          {fields?.slice(0,3).map((field) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={field.id}>
-              <Card
-                sx={{
-                  height: "100%",
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 3,
-                  bgcolor: "background.paper",
-                  transition: "0.2s",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: 4,
-                  },
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                    {field.fieldName}
-                  </Typography>
+          {fields.length > 3 && (
+            <Button
+              component={RouterLink}
+              to="/fields"
+              size="small"
+              endIcon={<ArrowForwardRoundedIcon />}
+              sx={{ fontWeight: 600 }}
+            >
+              View all
+            </Button>
+          )}
+        </Stack>
 
-                  <Typography variant="body2" color="text.secondary">
-                    {field.description}
-                  </Typography>
+        {fields.length === 0 ? (
+          <EmptyState message="No fields available yet. Check back soon!" />
+        ) : (
+          <Grid container spacing={3}>
+            {fields.slice(0, 3).map((field) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={field.id}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    height: "100%",
+                    borderRadius: 3,
+                    bgcolor: "background.paper",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    transition:
+                      "transform .2s ease, box-shadow .2s ease, border-color .2s ease",
 
-                  <Button
-                    href={`/fields/${field.id}`}
-                    endIcon={<ArrowForwardRoundedIcon />}
-                    sx={{ mt: 2 }}
+                    "&:hover": {
+                      transform: "translateY(-4px)",
+                      borderColor: "primary.main",
+                      boxShadow: (t) =>
+                        `0 16px 32px -16px ${alpha(
+                          t.palette.primary.main,
+                          t.palette.mode === "dark" ? 0.35 : 0.22,
+                        )}`,
+
+                      "& .field-arrow": {
+                        transform: "translateX(4px)",
+                      },
+                    },
+                  }}
+                >
+                  <CardActionArea
+                    component={RouterLink}
+                    to={`/fields/${field.id}`}
+                    sx={{ height: "100%", borderRadius: 3 }}
                   >
-                    Explore
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                    <CardContent
+                      sx={{
+                        p: 3,
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                      }}
+                    >
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                        {field.fieldName}
+                      </Typography>
+
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          mb: 2,
+                          flexGrow: 1,
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {field.description}
+                      </Typography>
+
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        sx={{
+                          alignItems: "center",
+                          color: "primary.main",
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          Explore
+                        </Typography>
+
+                        <ArrowForwardRoundedIcon
+                          className="field-arrow"
+                          fontSize="small"
+                          sx={{ transition: "transform .2s ease" }}
+                        />
+                      </Stack>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Box>
     </Container>
   );

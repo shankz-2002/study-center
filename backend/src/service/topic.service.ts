@@ -2,6 +2,8 @@ import type { Category } from "../entity/category.js";
 import { ApiError } from "../utils/ApiError.js";
 import {
   categoryRepository,
+  levelRepository,
+  progressRepository,
   topicRepository,
   userTopicCompletionRepository,
 } from "../utils/repository.js";
@@ -109,5 +111,25 @@ export class topicService {
       percentage: completion.percentage,
       completedAt: completion.completedAt,
     }));
+  };
+  static overallProgress = async (userId: string) => {
+    await userService.getUser(userId);
+    const totalTopics = await topicRepository.count();
+    const totalLevels = await levelRepository.count();
+    const completedLevels = await progressRepository.count({
+      where: { user: { id: userId } },
+    });
+    const completedTopics = await userTopicCompletionRepository.count({
+      where: { user: { id: userId } },
+    });
+    const overallProgress =
+      totalLevels > 0 ? Math.round((completedLevels / totalLevels) * 100) : 0;
+    return {
+      totalTopics,
+      totalLevels,
+      completedTopics,
+      completedLevels,
+      overallProgress,
+    };
   };
 }
